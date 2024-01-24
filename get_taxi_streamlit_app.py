@@ -35,10 +35,10 @@ import datetime as dt
 st.set_page_config(
 
 
-    page_title="Page Title",
+		page_title="Page Title",
 
 
-    layout='wide'
+		layout='wide'
 
 
 )
@@ -60,16 +60,16 @@ sns.set_context('paper', font_scale=1.4)
 
 def line_break():
 
-    return st.write("<br>", unsafe_allow_html=True)
+		return st.write("<br>", unsafe_allow_html=True)
 
 
 # Dashboard Title
 st.write(
 
-    "<h1><center>Title</center></h1>",
+		"<h1><center>Title</center></h1>",
 
 
-    unsafe_allow_html=True
+		unsafe_allow_html=True
 
 
 )
@@ -83,9 +83,9 @@ st.write("<br>", unsafe_allow_html=True)
 
 st.write(
 
-    "<h5><center>Some more text comes here.</center></h5>",
+		"<h5><center>Some more text comes here.</center></h5>",
 
-    unsafe_allow_html=True
+		unsafe_allow_html=True
 
 )
 
@@ -98,278 +98,278 @@ st.write("<br>", unsafe_allow_html=True)
 @st.cache_data
 def get_data():
 
-    datasets = pd.read_csv(
-        "./datasets/data_offers.csv"), pd.read_csv("./datasets/data_orders.csv")
+		datasets = pd.read_csv(
+				"./datasets/data_offers.csv"), pd.read_csv("./datasets/data_orders.csv")
 
-    offers_df = datasets[0]
+		offers_df = datasets[0]
 
-    orders_df = datasets[1]
+		orders_df = datasets[1]
 
-    # Sidebar Filters
+		# Sidebar Filters
 
-    # with st.sidebar:
+		# with st.sidebar:
 
-    # 	# Some Dataset Filters
+		# 	# Some Dataset Filters
 
-    # Do your work here
+		# Do your work here
 
-    # In[2]:
+		# In[2]:
 
-    # st.write(offers_df.shape, orders_df.shape)
+		# st.write(offers_df.shape, orders_df.shape)
 
-    # st.dataframe(orders_df.sample(3))
+		# st.dataframe(orders_df.sample(3))
 
-    orders_df['order_status_key'] = orders_df['order_status_key'].apply(
+		orders_df['order_status_key'] = orders_df['order_status_key'].apply(
 
-        lambda x: 'Cancelled By Client' if x == 4 else 'Cancelled By System'
+				lambda x: 'Cancelled By Client' if x == 4 else 'Cancelled By System'
 
 
-    )
+		)
 
-    orders_df['cancellations_time_in_seconds'] = orders_df.cancellations_time_in_seconds.apply(
+		orders_df['cancellations_time_in_seconds'] = orders_df.cancellations_time_in_seconds.apply(
 
-        lambda x: x / 60
+				lambda x: x / 60
 
-    )
+		)
 
-    orders_df = orders_df.rename(
+		orders_df = orders_df.rename(
 
 
-        {'cancellations_time_in_seconds': 'cancellations_time_in_minutes'},
+				{'cancellations_time_in_seconds': 'cancellations_time_in_minutes'},
 
 
-        axis=1
+				axis=1
 
 
-    )
+		)
 
-    orders_df.m_order_eta = orders_df.m_order_eta.apply(
+		orders_df.m_order_eta = orders_df.m_order_eta.apply(
 
-        lambda x: x / 60
+				lambda x: x / 60
 
 
-    )
+		)
 
-    # st.dataframe(pd.DataFrame(
-    #     orders_df.order_status_key.value_counts() / len(orders_df)))
+		# st.dataframe(pd.DataFrame(
+		#     orders_df.order_status_key.value_counts() / len(orders_df)))
 
-    # st.write("\n")
+		# st.write("\n")
 
-    # show_nan(orders_df)
+		# show_nan(orders_df)
 
-    # st.write("\n")
+		# st.write("\n")
 
-    # st.dataframe(offers_df.sample(3))
+		# st.dataframe(offers_df.sample(3))
 
-    # st.write("\n")
+		# st.write("\n")
 
-    offers_cnt_df = offers_df.groupby(
+		offers_cnt_df = offers_df.groupby(
 
-        ['order_gk'],
+				['order_gk'],
 
-        as_index=False, dropna=False
+				as_index=False, dropna=False
 
-    ).agg(
+		).agg(
 
-        {"offer_id": pd.Series.nunique}
+				{"offer_id": pd.Series.nunique}
 
-    ).sort_values(
+		).sort_values(
 
-        by=['order_gk'],
+				by=['order_gk'],
 
-        ascending=[True]
+				ascending=[True]
 
-    )
+		)
 
-    offers_cnt_df = offers_cnt_df.rename(
+		offers_cnt_df = offers_cnt_df.rename(
 
-        {"offer_id": 'num_offers_applied'}, axis=1
+				{"offer_id": 'num_offers_applied'}, axis=1
 
-    )
+		)
 
-    st.write("\n")
+		st.write("\n")
 
-    orders_df = pd.merge(orders_df, offers_cnt_df,
-                         on='order_gk', how='left')
+		orders_df = pd.merge(orders_df, offers_cnt_df,
+												 on='order_gk', how='left')
 
-    orders_df.num_offers_applied = orders_df.num_offers_applied.apply(
+		orders_df.num_offers_applied = orders_df.num_offers_applied.apply(
 
-        lambda x: 0 if 'nan' in str(x).lower() else x
+				lambda x: 0 if 'nan' in str(x).lower() else x
 
-    )
+		)
 
-    # st.dataframe(orders_df.sample(5))
+		# st.dataframe(orders_df.sample(5))
 
-    # st.write("\n")
+		# st.write("\n")
 
-    # grp_df = orders_df.groupby(
+		# grp_df = orders_df.groupby(
 
-    #     ['order_status_key', 'is_driver_assigned_key'],
+		#     ['order_status_key', 'is_driver_assigned_key'],
 
-    #     as_index=False,
+		#     as_index=False,
 
-    #     dropna=False
+		#     dropna=False
 
-    # ).agg(
+		# ).agg(
 
-    #     {
+		#     {
 
-    #         "cancellations_time_in_minutes": pd.Series.mean,
+		#         "cancellations_time_in_minutes": pd.Series.mean,
 
-    #         "m_order_eta": pd.Series.mean,
+		#         "m_order_eta": pd.Series.mean,
 
-    #         'order_gk': pd.Series.nunique,
+		#         'order_gk': pd.Series.nunique,
 
-    #         'num_offers_applied': pd.Series.mean
+		#         'num_offers_applied': pd.Series.mean
 
-    #     }
+		#     }
 
-    # ).sort_values(by=[
+		# ).sort_values(by=[
 
-    #     'order_status_key',
+		#     'order_status_key',
 
-    #     'is_driver_assigned_key'
+		#     'is_driver_assigned_key'
 
-    # ], ascending=[
+		# ], ascending=[
 
-    #     True,
+		#     True,
 
-    #     True
+		#     True
 
-    # ]
+		# ]
 
-    # )
+		# )
 
-    # grp_df.columns = [
+		# grp_df.columns = [
 
-    #     'order_status_key',
+		#     'order_status_key',
 
-    #     'is_driver_assigned_key',
+		#     'is_driver_assigned_key',
 
-    #     'mean_cancellations_time_in_mins',
+		#     'mean_cancellations_time_in_mins',
 
-    #     'mean_m_order_eta_mins',
+		#     'mean_m_order_eta_mins',
 
-    #     'num_orders',
+		#     'num_orders',
 
-    #     'mean_num_offers_applied'
+		#     'mean_num_offers_applied'
 
-    # ]
+		# ]
 
-    # grp_df['%_of_total_orders'] = grp_df['num_orders'] / len(orders_df)
+		# grp_df['%_of_total_orders'] = grp_df['num_orders'] / len(orders_df)
 
-    # grp_df = grp_df.reindex(columns=[
+		# grp_df = grp_df.reindex(columns=[
 
-    #     'order_status_key',
+		#     'order_status_key',
 
-    #     'is_driver_assigned_key',
+		#     'is_driver_assigned_key',
 
-    #     'mean_cancellations_time_in_mins',
+		#     'mean_cancellations_time_in_mins',
 
-    #     'mean_m_order_eta_mins',
+		#     'mean_m_order_eta_mins',
 
-    #     '%_of_total_orders',
+		#     '%_of_total_orders',
 
-    #     'num_orders',
+		#     'num_orders',
 
-    #     'mean_num_offers_applied'
+		#     'mean_num_offers_applied'
 
-    # ])
+		# ])
 
-    # grp_df.mean_num_offers_applied = grp_df.mean_num_offers_applied.apply(
+		# grp_df.mean_num_offers_applied = grp_df.mean_num_offers_applied.apply(
 
-    #     lambda x: round(x, 0)
+		#     lambda x: round(x, 0)
 
-    # )
+		# )
 
-    # st.dataframe(grp_df)
+		# st.dataframe(grp_df)
 
-    orders_df.is_driver_assigned_key = orders_df.is_driver_assigned_key.apply(
+		orders_df.is_driver_assigned_key = orders_df.is_driver_assigned_key.apply(
 
 
-        lambda x: 'Yes' if x == 1 else 'No'
+				lambda x: 'Yes' if x == 1 else 'No'
 
 
-    )
+		)
 
-    # st.write("<br><br><br>", unsafe_allow_html=True)
+		# st.write("<br><br><br>", unsafe_allow_html=True)
 
-    # st.write("m_order_eta only when a driver is assigned.")
+		# st.write("m_order_eta only when a driver is assigned.")
 
-    # st.write("\n")
+		# st.write("\n")
 
-    # st.write("cancellations_time_in_minutes only when cancelled by client.")
+		# st.write("cancellations_time_in_minutes only when cancelled by client.")
 
-    # st.write("<br>", unsafe_allow_html=True)
+		# st.write("<br>", unsafe_allow_html=True)
 
-    # st.write(
+		# st.write(
 
-    #     "<br><br>Filters:<br><br>1.Hour of Ride Booking<br><br>2.orders_status_key<br><br>3.is_driver_assigned_key",
+		#     "<br><br>Filters:<br><br>1.Hour of Ride Booking<br><br>2.orders_status_key<br><br>3.is_driver_assigned_key",
 
-    #     unsafe_allow_html=True
+		#     unsafe_allow_html=True
 
-    # )
+		# )
 
-    # st.write("<br>", unsafe_allow_html=True)
+		# st.write("<br>", unsafe_allow_html=True)
 
-    # st.write(
+		# st.write(
 
-    #     "Metrics: <br><br>1.Count Orders<br><br>2.Mean Cancellation Time In Minutes <br><br>3.Mean m_order_eta in Minutes<br><br>4.Mean num_offers_applied<br><br>5. Most Frequently Used offer_id",
+		#     "Metrics: <br><br>1.Count Orders<br><br>2.Mean Cancellation Time In Minutes <br><br>3.Mean m_order_eta in Minutes<br><br>4.Mean num_offers_applied<br><br>5. Most Frequently Used offer_id",
 
-    #     unsafe_allow_html=True
+		#     unsafe_allow_html=True
 
-    # )
+		# )
 
-    # st.write("<br>", unsafe_allow_html=True)
+		# st.write("<br>", unsafe_allow_html=True)
 
-    # st.dataframe(pd.DataFrame(orders_df.dtypes))
+		# st.dataframe(pd.DataFrame(orders_df.dtypes))
 
-    # st.write("<br>", unsafe_allow_html=True)
+		# st.write("<br>", unsafe_allow_html=True)
 
-    orders_df['order_datetime'] = orders_df.order_datetime.apply(
+		orders_df['order_datetime'] = orders_df.order_datetime.apply(
 
-        lambda x: dt.datetime.strptime(x, "%H:%M:%S")
+				lambda x: dt.datetime.strptime(x, "%H:%M:%S")
 
-    )
+		)
 
-    orders_df['booking_hour'] = orders_df.order_datetime.apply(
+		orders_df['booking_hour'] = orders_df.order_datetime.apply(
 
-        lambda x: int(dt.datetime.strftime(x, "%H")
+				lambda x: int(dt.datetime.strftime(x, "%H")
 
-                      )
+											)
 
 
-    )
+		)
 
-    orders_df['booking_minute'] = orders_df.order_datetime.apply(
+		orders_df['booking_minute'] = orders_df.order_datetime.apply(
 
-        lambda x: int(dt.datetime.strftime(x, "%M"))
+				lambda x: int(dt.datetime.strftime(x, "%M"))
 
 
-    )
+		)
 
-    orders_df = orders_df.reindex(
+		orders_df = orders_df.reindex(
 
 
-        columns=[
-            "order_datetime",
-            "booking_hour",
-            "booking_minute",
-            "origin_longitude",
-            "origin_latitude",
-            "m_order_eta",
-            "order_gk",
-            "order_status_key",
-            "is_driver_assigned_key",
-            "cancellations_time_in_minutes",
-            "num_offers_applied"
-        ]
+				columns=[
+						"order_datetime",
+						"booking_hour",
+						"booking_minute",
+						"origin_longitude",
+						"origin_latitude",
+						"m_order_eta",
+						"order_gk",
+						"order_status_key",
+						"is_driver_assigned_key",
+						"cancellations_time_in_minutes",
+						"num_offers_applied"
+				]
 
 
 
-    )
+		)
 
-    return orders_df, offers_df
+		return orders_df, offers_df
 
 
 orders_df, offers_df = get_data()
@@ -380,146 +380,146 @@ orders_df, offers_df = get_data()
 
 with st.sidebar:
 
-    st.write("<h1><center>Filters</center></h1>", unsafe_allow_html=True)
+		st.write("<h1><center>Filters</center></h1>", unsafe_allow_html=True)
 
-    line_break()
+		line_break()
 
-    # Creating Several Session State Variables
+		# Creating Several Session State Variables
 
-    if 'hours' not in st.session_state:
+		if 'hours' not in st.session_state:
 
-        st.session_state.hours = (dt.time(8, 0), dt.time(18, 0))
+				st.session_state.hours = (dt.time(8, 0), dt.time(18, 0))
 
-    if 'order_status' not in st.session_state:
+		if 'order_status' not in st.session_state:
 
-        order_statuses = orders_df.order_status_key.unique().tolist()
+				order_statuses = orders_df.order_status_key.unique().tolist()
 
-        order_statuses.sort()
+				order_statuses.sort()
 
-        st.session_state.order_status = order_statuses
+				st.session_state.order_status = order_statuses
 
-    if 'is_driver_assigned' not in st.session_state:
+		if 'is_driver_assigned' not in st.session_state:
 
-        is_driver_keys = ['Yes', 'No']
+				is_driver_keys = ['Yes', 'No']
 
-        st.session_state.is_driver_assigned = is_driver_keys
+				st.session_state.is_driver_assigned = is_driver_keys
 
-  # Hours Slider
+	# Hours Slider
 
-    def change_hours_sel():
+		def change_hours_sel():
 
-        st.session_state.hours = st.session_state.new_hours
+				st.session_state.hours = st.session_state.new_hours
 
-    hours_sel = st.slider(
+		hours_sel = st.slider(
 
 
-        "Time Period",
+				"Time Period",
 
 
-        value=(dt.time(8, 0), dt.time(18, 0)),
+				value=(dt.time(8, 0), dt.time(18, 0)),
 
 
-        on_change=change_hours_sel,
+				on_change=change_hours_sel,
 
 
-        key='new_hours'
+				key='new_hours'
 
 
-    )
+		)
 
-    line_break()
+		line_break()
 
-    line_break()
+		line_break()
 
-    # Order Status Multi Select
+		# Order Status Multi Select
 
-    order_status_list = ['All']
+		order_status_list = ['All']
 
-    unique_order_status = orders_df.order_status_key.unique().tolist()
+		unique_order_status = orders_df.order_status_key.unique().tolist()
 
-    unique_order_status.sort()
+		unique_order_status.sort()
 
-    order_status_list.extend(unique_order_status)
+		order_status_list.extend(unique_order_status)
 
-    def change_order_status_sel():
+		def change_order_status_sel():
 
-        st.session_state.order_status = st.session_state.new_order_status
+				st.session_state.order_status = st.session_state.new_order_status
 
-        options = orders_df.order_status_key.unique().tolist()
+				options = orders_df.order_status_key.unique().tolist()
 
-        options.sort()
+				options.sort()
 
-        if 'All' in st.session_state.order_status:
+				if 'All' in st.session_state.order_status:
 
-            st.session_state.order_status = options
+						st.session_state.order_status = options
 
-        elif len(st.session_state.order_status) == 0:
+				elif len(st.session_state.order_status) == 0:
 
-            st.session_state.order_status = options
+						st.session_state.order_status = options
 
-        else:
+				else:
 
-            pass
+						pass
 
-    order_status_sel = st.multiselect(
+		order_status_sel = st.multiselect(
 
-        "Order Status",
+				"Order Status",
 
-        order_status_list,
+				order_status_list,
 
-        ['All'],
+				['All'],
 
 
-        on_change=change_order_status_sel,
+				on_change=change_order_status_sel,
 
 
-        key='new_order_status'
+				key='new_order_status'
 
 
-    )
+		)
 
-    line_break()
+		line_break()
 
-    line_break()
+		line_break()
 
-    def change_driver_assigned_sel():
+		def change_driver_assigned_sel():
 
-        st.session_state.is_driver_assigned = st.session_state.new_is_driver_assigned
+				st.session_state.is_driver_assigned = st.session_state.new_is_driver_assigned
 
-        keys = ['Yes', 'No']
+				keys = ['Yes', 'No']
 
-        if 'All' in st.session_state.is_driver_assigned:
+				if 'All' in st.session_state.is_driver_assigned:
 
-            st.session_state.is_driver_assigned = keys
+						st.session_state.is_driver_assigned = keys
 
-        elif len(st.session_state.is_driver_assigned) == 0:
+				elif len(st.session_state.is_driver_assigned) == 0:
 
-            st.session_state.is_driver_assigned = keys
+						st.session_state.is_driver_assigned = keys
 
-        else:
+				else:
 
-            pass
+						pass
 
-    driver_assigned_sel = st.multiselect(
+		driver_assigned_sel = st.multiselect(
 
 
-        "Driver Assigned",
+				"Driver Assigned",
 
 
-        ['All', 'Yes', 'No'],
+				['All', 'Yes', 'No'],
 
 
-        ['All'],
+				['All'],
 
 
-        on_change=change_driver_assigned_sel,
+				on_change=change_driver_assigned_sel,
 
 
-        key='new_is_driver_assigned'
+				key='new_is_driver_assigned'
 
 
 
-    )
+		)
 
 
 # Applying Filters To DataFrame
@@ -527,11 +527,11 @@ with st.sidebar:
 
 orders_df = orders_df[
 
-    (orders_df.order_status_key.isin(st.session_state.order_status)) &
+		(orders_df.order_status_key.isin(st.session_state.order_status)) &
 
 
-    (orders_df.is_driver_assigned_key.isin(
-        st.session_state.is_driver_assigned))
+		(orders_df.is_driver_assigned_key.isin(
+				st.session_state.is_driver_assigned))
 
 
 ]
@@ -543,10 +543,10 @@ orders_df = orders_df[
 ords_df = orders_df[
 
 
-    (orders_df.booking_hour >= st.session_state.hours[0].hour) &
+		(orders_df.booking_hour >= st.session_state.hours[0].hour) &
 
 
-    (orders_df.booking_hour <= st.session_state.hours[1].hour)
+		(orders_df.booking_hour <= st.session_state.hours[1].hour)
 
 
 ]
@@ -560,53 +560,69 @@ kpicol1, kpicol2, kpicol3 = st.columns(3)
 
 with kpicol1:
 
-    with st.container(border=True):
+		with st.container(border=True):
 
-        # Mean m_order_eta
+				# Mean m_order_eta
 
-        m_order_eta_kpi = st.metric(
+				m_order_eta_kpi = st.metric(
 
-            "Mean Time Before Order Arrival",
+						"Mean Time Before Order Arrival",
 
-            f"{ords_df.m_order_eta.mean():.1f} Mins"
+						f"{ords_df.m_order_eta.mean():.1f} Mins"
 
 
-        )
+				)
 
 
 with kpicol2:
 
-    with st.container(border=True):
+		with st.container(border=True):
 
-        # Mean cancellations_time_in_minutes
+				# Mean cancellations_time_in_minutes
 
-        cancellation_time_kpi = st.metric(
+				cancellation_time_kpi = st.metric(
 
-            "Mean Cancellation Time",
+						"Mean Cancellation Time",
 
-            f"{ords_df.cancellations_time_in_minutes.mean():.1f} Mins"
+						f"{ords_df.cancellations_time_in_minutes.mean():.1f} Mins"
 
 
-        )
+				)
 
 
 with kpicol3:
 
-    with st.container(border=True):
+		with st.container(border=True):
 
-        # Mean num_offers_applied
+				# Mean num_offers_applied
 
-        offers_applied_kpi = st.metric(
+				offers_applied_kpi = st.metric(
 
-            "Mean Offers Applied Per Order",
+						"Mean Offers Applied Per Order",
 
-            f"{ords_df.num_offers_applied.mean():.0f} Offers"
+						f"{ords_df.num_offers_applied.mean():.0f} Offers"
 
 
-        )
+				)
 
 
 line_break()
+
+
+
+# Creating Some Tabs
+
+
+tab1, tab2 = st.tabs(
+
+	['Dual Y-Axes Chart by Hour', 'Ride Cancellations Hexbin Map']
+
+)
+
+
+
+# We will use these tabs later
+
 
 
 # Creating Aggregated DataFrame By Hour
@@ -620,11 +636,11 @@ minutes = []
 
 for i in range(0, 24):
 
-    for j in range(0, 60):
+		for j in range(0, 60):
 
-        hours.append(i)
+				hours.append(i)
 
-        minutes.append(j)
+				minutes.append(j)
 
 
 _ = pd.DataFrame()
@@ -650,56 +666,56 @@ _avg_num_offers_applied = []
 
 for i in range(len(_)):
 
-    mean_m_order_eta = orders_df[
+		mean_m_order_eta = orders_df[
 
 
-        (orders_df.booking_hour == _.iloc[i, ::1][0]) &
+				(orders_df.booking_hour == _.iloc[i, ::1][0]) &
 
 
-        (orders_df.booking_minute == _.iloc[i, ::1][1])
+				(orders_df.booking_minute == _.iloc[i, ::1][1])
 
-    ].m_order_eta.mean()
+		].m_order_eta.mean()
 
-    mean_cancellations_time = orders_df[
-
-
-        (orders_df.booking_hour == _.iloc[i, ::1][0]) &
+		mean_cancellations_time = orders_df[
 
 
-        (orders_df.booking_minute == _.iloc[i, ::1][1])
+				(orders_df.booking_hour == _.iloc[i, ::1][0]) &
 
 
-    ].cancellations_time_in_minutes.mean()
-
-    mean_num_offers_applied = orders_df[
+				(orders_df.booking_minute == _.iloc[i, ::1][1])
 
 
-        (orders_df.booking_hour == _.iloc[i, ::1][0]) &
+		].cancellations_time_in_minutes.mean()
+
+		mean_num_offers_applied = orders_df[
 
 
-        (orders_df.booking_minute == _.iloc[i, ::1][1])
+				(orders_df.booking_hour == _.iloc[i, ::1][0]) &
 
 
-    ].num_offers_applied.mean()
-
-    sum_order_cancellations = orders_df[
+				(orders_df.booking_minute == _.iloc[i, ::1][1])
 
 
-        (orders_df.booking_hour == _.iloc[i, ::1][0]) &
+		].num_offers_applied.mean()
+
+		sum_order_cancellations = orders_df[
 
 
-        (orders_df.booking_minute == _.iloc[i, ::1][1])
+				(orders_df.booking_hour == _.iloc[i, ::1][0]) &
 
 
-    ].order_gk.nunique()
+				(orders_df.booking_minute == _.iloc[i, ::1][1])
 
-    _avg_m_order_eta.append(mean_m_order_eta)
 
-    _avg_cancellation_minutes.append(mean_cancellations_time)
+		].order_gk.nunique()
 
-    _avg_num_offers_applied.append(mean_num_offers_applied)
+		_avg_m_order_eta.append(mean_m_order_eta)
 
-    _sum_cancellations.append(sum_order_cancellations)
+		_avg_cancellation_minutes.append(mean_cancellations_time)
+
+		_avg_num_offers_applied.append(mean_num_offers_applied)
+
+		_sum_cancellations.append(sum_order_cancellations)
 
 
 _['mean_m_order_eta'] = _avg_m_order_eta
@@ -724,10 +740,10 @@ en_time = st.session_state.hours[1]
 
 _ = _[
 
-    (_.hour >= st_time.hour) &
+		(_.hour >= st_time.hour) &
 
 
-    (_.hour <= en_time.hour)
+		(_.hour <= en_time.hour)
 
 ]
 
@@ -740,13 +756,13 @@ _['time'] = _.apply(lambda x: dt.time(int(x[0]), int(x[1])), axis=1)
 
 _ = _.reindex(columns=[
 
-    "time",
-    "hour",
-    "minute",
-    "mean_m_order_eta",
-    "mean_cancellations_time_in_mins",
-    "mean_num_offers_applied",
-    "total_order_cancellations"
+		"time",
+		"hour",
+		"minute",
+		"mean_m_order_eta",
+		"mean_cancellations_time_in_mins",
+		"mean_num_offers_applied",
+		"total_order_cancellations"
 
 ]
 
@@ -756,17 +772,17 @@ _ = _.reindex(columns=[
 
 _ = _.groupby(['hour'], as_index=False, dropna=False).agg(
 
-    {
+		{
 
-        "mean_m_order_eta": pd.Series.mean,
+				"mean_m_order_eta": pd.Series.mean,
 
-        "mean_cancellations_time_in_mins": pd.Series.mean,
+				"mean_cancellations_time_in_mins": pd.Series.mean,
 
-        "mean_num_offers_applied": pd.Series.mean,
+				"mean_num_offers_applied": pd.Series.mean,
 
-        "total_order_cancellations": pd.Series.sum
+				"total_order_cancellations": pd.Series.sum
 
-    }
+		}
 
 
 )
@@ -778,10 +794,10 @@ _.mean_num_offers_applied = _.mean_num_offers_applied.round(0)
 _['time'] = _['hour'].apply(lambda x: dt.datetime.strftime(
 
 
-    dt.datetime(1990, 6, 1, int(x), 0),
+		dt.datetime(1990, 6, 1, int(x), 0),
 
 
-    "%H:%M"
+		"%H:%M"
 
 
 )
@@ -794,691 +810,1013 @@ _['time'] = _['hour'].apply(lambda x: dt.datetime.strftime(
 
 def get_charts():
 
+		# Secondary Y-Axis Charts
 
-    # Secondary Y-Axis Charts
+		fig = make_subplots(specs=[[{"secondary_y": True}]])
 
+		fig.add_trace(
 
-    fig = make_subplots(specs=[[{"secondary_y": True}]])
 
+				go.Scatter(
 
-    fig.add_trace(
 
+						x=_['time'],
 
-        go.Scatter(
 
+						y=_[metric_mapper[st.session_state.left_y]],
 
-            x=_['time'],
 
+						mode='lines',
 
-            y=_[metric_mapper[st.session_state.left_y]],
 
+						name=st.session_state.left_y,
 
-            mode='lines',
 
+						line=dict(width=3.0)
 
-            name=st.session_state.left_y,
+				),
 
 
-            line = dict(width = 3.0)
+				secondary_y=False,
 
-        ),
 
+		)
 
-        secondary_y=False,
+		if st.session_state.right_y.lower().strip() != 'none':
 
+			fig.add_trace(
 
-    )
 
+					go.Scatter(
 
 
-    fig.add_trace(
+							x=_['time'],
 
 
-        go.Scatter(
+							y=_[metric_mapper[st.session_state.right_y]],
 
 
-            x=_['time'],
+							mode='lines',
 
 
-            y=_[metric_mapper[st.session_state.right_y]],
+							name=st.session_state.right_y,
 
 
-            mode='lines',
+							line=dict(width=3.0)
 
+					),
 
-            name=st.session_state.right_y,
 
+					secondary_y=True,
 
-            line = dict(width = 3.0)
 
-        ),
+			)
 
+			fig.update_yaxes(
 
-        secondary_y=True,
+				title=st.session_state.right_y,
 
+				secondary_y=True,
 
-    )
+				showgrid=False
 
-    fig.update_yaxes(title=st.session_state.left_y, secondary_y=False)
+			)
 
-    fig.update_yaxes(title=st.session_state.right_y,
-                     secondary_y=True, showgrid=False)
+		if len(_) > 16:
 
+			fig.update_xaxes(title='Hour', tickangle=-45)
 
+		else:
 
-    if len(_) > 16:
+			fig.update_xaxes(title='Hour')
 
+		fig.update_yaxes(title=st.session_state.left_y, secondary_y=False)
 
-    	fig.update_xaxes(title='Hour', tickangle = -45)
+		if st.session_state.right_y.lower().strip() != 'none':
 
+			if 'minutes' in st.session_state.right_y.lower() and 'minutes' in st.session_state.left_y.lower():
 
-    else:
+					hovertemp = "<br><br>".join(
 
+							[
 
-    	fig.update_xaxes(title = 'Hour')
+									"<b>%{x}</b>",
 
+									"<b>%{y:.1f} minutes</b><extra></extra>",
 
+									""
 
-    if 'minutes' in st.session_state.right_y.lower() and 'minutes' in st.session_state.left_y.lower():
+							]
 
-        hovertemp = "<br><br>".join(
+					)
 
-            [
+					fig.update_traces(
 
-                "<b>%{x}</b>",
 
-                "<b>%{y:.1f} minutes</b><extra></extra>",
+							hovertemplate=hovertemp,
 
-                ""
 
-            ]
+							selector=({'name': st.session_state.right_y})
 
-        )
 
-        fig.update_traces(
+					)
 
+					fig.update_traces(
 
-            hovertemplate=hovertemp,
 
+							hovertemplate=hovertemp,
 
-            selector=({'name': st.session_state.right_y})
 
+							selector=({'name': st.session_state.left_y})
 
-        )
 
-        fig.update_traces(
+					)
 
+			elif 'minutes' in st.session_state.right_y.lower():
 
-            hovertemplate=hovertemp,
+					hovertemp_1 = "<br><br>".join(
 
+							[
 
-            selector=({'name': st.session_state.left_y})
+									"<b>%{x}</b>",
 
+									"<b>%{y:.1f} minutes</b><extra></extra>"
 
-        )
+							]
 
-    elif 'minutes' in st.session_state.right_y.lower():
+					)
 
-        hovertemp_1 = "<br><br>".join(
+					if 'offer' in st.session_state.left_y.lower():
 
-            [
+							hovertemp_2 = "<br><br>".join(
 
-                "<b>%{x}</b>",
+									[
 
-                "<b>%{y:.1f} minutes</b><extra></extra>"
+											"<b>%{x}</b>",
 
-            ]
 
-        )
+											"<b>%{y} offers</b><extra></extra>"
 
-        if 'offer' in st.session_state.left_y.lower():
+									]
 
-            hovertemp_2 = "<br><br>".join(
+							)
 
-                [
+					else:
 
-                    "<b>%{x}</b>",
+							hovertemp_2 = "<br><br>".join(
 
+									[
 
-                    "<b>%{y} offers</b><extra></extra>"
+											"<b>%{x}</b>",
 
-                ]
 
-            )
+											"<b>%{y} cancellations</b><extra></extra>"
 
-        else:
+									]
 
-            hovertemp_2 = "<br><br>".join(
+							)
 
-                [
+					fig.update_traces(
 
-                    "<b>%{x}</b>",
 
+							hovertemplate=hovertemp_1,
 
-                    "<b>%{y} cancellations</b><extra></extra>"
 
-                ]
+							selector=({'name': st.session_state.right_y})
 
-            )
 
-        fig.update_traces(
+					)
 
+					fig.update_traces(
 
-            hovertemplate=hovertemp_1,
 
+							hovertemplate=hovertemp_2,
 
-            selector=({'name': st.session_state.right_y})
 
+							selector=({'name': st.session_state.left_y})
 
-        )
 
-        fig.update_traces(
+					)
 
+			elif 'minutes' in st.session_state.left_y.lower():
 
-            hovertemplate=hovertemp_2,
+					hovertemp_1 = "<br><br>".join(
 
+							[
 
-            selector=({'name': st.session_state.left_y})
+									"<b>%{x}</b>",
 
 
-        )
+									"<b>%{y:.1f} minutes</b><extra></extra>"
 
-    elif 'minutes' in st.session_state.left_y.lower():
+							]
 
-        hovertemp_1 = "<br><br>".join(
+					)
 
-            [
+					if 'offer' in st.session_state.right_y.lower():
 
-                "<b>%{x}</b>",
+							hovertemp_2 = "<br><br>".join(
 
+									[
 
-                "<b>%{y:.1f} minutes</b><extra></extra>"
+											"<b>%{x}</b>",
 
-            ]
 
-        )
+											"<b>%{y} offers</b><extra></extra>"
 
-        if 'offer' in st.session_state.right_y.lower():
+									]
 
-            hovertemp_2 = "<br><br>".join(
+							)
 
-                [
+					else:
 
-                    "<b>%{x}</b>",
+							hovertemp_2 = "<br><br>".join(
 
+									[
 
-                    "<b>%{y} offers</b><extra></extra>"
+											"<b>%{x}</b>",
 
-                ]
 
-            )
+											"<b>%{y} cancellations</b><extra></extra>"
 
-        else:
+									]
 
-            hovertemp_2 = "<br><br>".join(
+							)
 
-                [
+					fig.update_traces(
 
-                    "<b>%{x}</b>",
 
+							hovertemplate=hovertemp_1,
 
-                    "<b>%{y} cancellations</b><extra></extra>"
 
-                ]
+							selector=({'name': st.session_state.left_y})
 
-            )
 
-        fig.update_traces(
+					)
 
+					fig.update_traces(
 
-            hovertemplate=hovertemp_1,
 
+							hovertemplate=hovertemp_2,
 
-            selector=({'name': st.session_state.left_y})
 
+							selector=({'name': st.session_state.right_y})
 
-        )
 
-        fig.update_traces(
+					)
 
+			else:
 
-            hovertemplate=hovertemp_2,
+					pass
 
+		else:
 
-            selector=({'name': st.session_state.right_y})
+			hovertemp = ""
 
+			if 'minutes' in st.session_state.left_y.lower():
 
-        )
 
-    else:
+				hovertemp = "<br><br>".join(
 
-        pass
+					[
 
-    fig.update_layout(
+						"<b>%{x}</b>",
 
 
-        title=dict(
+						"<b>%{y:.1f} minutes</b><extra></extra>"
 
+					]
 
-            text=f"{st.session_state.left_y} & {st.session_state.right_y} by Hour",
+				)
 
 
-            x=0.5,
 
+			elif 'offer' in st.session_state.left_y.lower():
 
-            xanchor='center',
 
+				hovertemp = "<br><br>".join(
 
-            yanchor='top',
+					[
 
+						"<b>%{x}</b>",
 
-            font=dict(size=23)
 
+						"<b>%{y} offers</b><extra></extra>"
 
-        )
+					]
 
+				)
 
-    )
 
-    fig.update_layout(
+			else:
 
-        # Alter the position of the legend.
-        legend={'x': 1.05, 'y': 1.0}
 
-    )
+				hovertemp = "<br><br>".join(
 
-    return fig
+					[
 
+						"<b>%{x}</b>",
 
-# Filters For Secondary Y-Axis Charts
 
+						"<b>%{y} cancellations</b><extra></extra>"
 
-metric_mapper = {
+					]
 
+				)
 
-    "Number of Order Cancellations": 'total_order_cancellations',
 
 
-    "Mean Cancellation Time in Minutes": 'mean_cancellations_time_in_mins',
+			fig.update_traces(
 
 
-    "Mean Time Before Order Arrival in Minutes": 'mean_m_order_eta',
+				hovertemplate=hovertemp,
 
 
-    "Mean Offers Applied": "mean_num_offers_applied"
+				selector=({'name': st.session_state.left_y})
 
 
-}
+			)
 
 
-portray_metrics = list(metric_mapper.keys())
 
 
-# Choose Y-Axes
 
 
-if 'left_y' not in st.session_state:
 
-    st.session_state.left_y = 'Number of Order Cancellations'
+		if st.session_state.right_y.lower().strip() != 'none':
 
 
-if 'right_y' not in st.session_state:
+			fig.update_layout(
 
-    st.session_state.right_y = "Mean Cancellation Time in Minutes"
 
+					title=dict(
 
-if 'portray_metrics_left' not in st.session_state:
 
-    st.session_state.portray_metrics_left = [
+							text=f"{st.session_state.left_y} & {st.session_state.right_y} by Hour",
 
-        i for i in portray_metrics if i != st.session_state.right_y
-    ]
 
+							x=0.395,
 
-if 'portray_metrics_right' not in st.session_state:
 
+							xanchor='center',
 
-    st.session_state.portray_metrics_right = [
 
-        i for i in portray_metrics if i != st.session_state.left_y
+							yanchor='top',
 
-    ]
 
+							font=dict(size=23)
 
-    st.session_state.portray_metrics_right.extend(["None"])
 
+					)
 
 
-# Two Columns for Y-Axes Metrics
+			)
 
 
-ycol1, ycol2 = st.columns(2)
+		else:
 
 
-with ycol1:
+			fig.update_layout(
 
-    def change_left_y_sel():
 
-        if st.session_state.new_left_y != st.session_state.new_right_y:
+					title=dict(
 
-            st.session_state.left_y = st.session_state.new_left_y
 
-        else:
+							text=f"{st.session_state.left_y} by Hour",
 
-            st.session_state.new_left_y = st.session_state.left_y
 
-            st.toast(
+							x=0.5,
 
-                f"Left and Right Y-axes cannot be the same.",
 
-                icon='ℹ️'
+							xanchor='center',
 
-            )
 
-    left_y_sel = st.selectbox(
+							yanchor='top',
 
 
-        "Choose Metric for Left Y-Axis",
+							font=dict(size=23)
 
 
-        st.session_state.portray_metrics_left,
+					)
 
 
-        index=0,
+			)
 
 
-        on_change=change_left_y_sel,
 
 
-        key='new_left_y'
+		fig.update_layout(
 
+				# Alter the position of the legend.
 
-    )
+				legend = {'x': 1.05, 'y': 1.0}
 
+		)
 
-with ycol2:
 
-    def change_right_y_sel():
+		return fig
 
-        if st.session_state.new_right_y != st.session_state.new_left_y:
 
-            st.session_state.right_y = st.session_state.new_right_y
 
-        else:
+with tab1:
 
-            st.session_state.new_right_y = st.session_state.right_y
 
-            st.toast(
+	# Filters For Secondary Y-Axis Charts
 
-                f"Left and Right Y-axes cannot be the same.",
 
-                icon='ℹ️'
+	metric_mapper = {
 
-            )
 
-    right_y_sel = st.selectbox(
+			"Number of Order Cancellations": 'total_order_cancellations',
 
 
-        "Choose Metric for Right Y-Axis",
+			"Mean Cancellation Time in Minutes": 'mean_cancellations_time_in_mins',
 
 
-        st.session_state.portray_metrics_right,
+			"Mean Time Before Order Arrival in Minutes": 'mean_m_order_eta',
 
 
-        index=0,
+			"Mean Offers Applied": "mean_num_offers_applied"
 
 
-        on_change=change_right_y_sel,
+	}
 
 
-        key='new_right_y'
+	portray_metrics = list(metric_mapper.keys())
 
 
-    )
+	# Choose Y-Axes
 
 
-line_break()
+	if 'left_y' not in st.session_state:
 
+			st.session_state.left_y = 'Number of Order Cancellations'
 
-# Display Secondary Y-Axis Plotly Line Chart
 
+	if 'right_y' not in st.session_state:
 
-st.plotly_chart(get_charts(), use_container_width=True)
+			st.session_state.right_y = "Mean Cancellation Time in Minutes"
 
 
-line_break()
+	if 'portray_metrics_left' not in st.session_state:
 
+			st.session_state.portray_metrics_left = [
 
-# Some KDE Plots
+					i for i in portray_metrics if i != st.session_state.right_y
+			]
 
 
-line_break()
+	if 'portray_metrics_right' not in st.session_state:
 
 
-num_orders_df = ords_df.groupby(
+			st.session_state.portray_metrics_right = [
 
-    ['booking_hour'],
+					i for i in portray_metrics if i != st.session_state.left_y
 
-    as_index=False,
+			]
 
-    dropna=False
 
-).agg(
+			st.session_state.portray_metrics_right.extend(["None"])
 
-    {"order_gk": pd.Series.nunique}
 
-).sort_values(
 
+	# Two Columns for Y-Axes Metrics
 
-    by=['booking_hour'],
 
+	ycol1, ycol2 = st.columns(2)
 
-    ascending=[True]
 
+	with ycol1:
 
-)
+			def change_left_y_sel():
 
+					if st.session_state.new_left_y != st.session_state.new_right_y:
 
-# num_orders_df['rolling_mean'] = num_orders_df.order_gk.rolling(
+							st.session_state.left_y = st.session_state.new_left_y
 
-#     window=2,
+					else:
 
-#     center=True
+							st.session_state.new_left_y = st.session_state.left_y
 
-# ).mean()
+							st.toast(
 
+									f"Left and Right Y-axes cannot be the same.",
 
-# Num Cancelled Orders By Hour Bar Chart
+									icon='ℹ️'
 
+							)
 
-fig = exp.line(
+			left_y_sel = st.selectbox(
 
 
-    num_orders_df,
+					"Choose Metric for Left Y-Axis",
 
 
-    x='booking_hour',
+					st.session_state.portray_metrics_left,
 
 
-    y='order_gk',
+					index=0,
 
 
-    text='order_gk'
+					on_change=change_left_y_sel,
 
 
-)
+					key='new_left_y'
 
 
-texttemp = "<b>%{text:.0f}</b>"
+			)
 
 
-hovertemp = "<br><br>".join([
+	with ycol2:
 
+			def change_right_y_sel():
 
-    "<b>Hour: %{x}</b>",
+					if st.session_state.new_right_y != st.session_state.new_left_y:
 
+							st.session_state.right_y = st.session_state.new_right_y
 
-    "<b>Cancelled Orders: %{y:.0f}</b><extra></extra>"
+					else:
 
-]
+							st.session_state.new_right_y = st.session_state.right_y
 
-)
+							st.toast(
 
+									f"Left and Right Y-axes cannot be the same.",
 
-fig.update_traces(
+									icon='ℹ️'
 
-    texttemplate=texttemp,
+							)
 
-    textposition='top center',
+			right_y_sel = st.selectbox(
 
-    hovertemplate=hovertemp
 
-)
+					"Choose Metric for Right Y-Axis",
 
 
-fig.update_xaxes(title='Hour')
+					st.session_state.portray_metrics_right,
 
 
-fig.update_yaxes(title='Cancelled Orders')
+					index=0,
 
 
-# fig.update_layout(bargap = 0.32)
+					on_change=change_right_y_sel,
 
 
-st.plotly_chart(fig, use_container_width=True)
+					key='new_right_y'
 
 
-line_break()
+			)
 
 
-# Plotly Histogram Function
+	line_break()
 
 
-def get_kde_plotly(df, colname):
+	# Display Secondary Y-Axis Plotly Line Chart
 
-    # Booking Hour KDE Plot
 
-    # fig = go.Figure()
+	st.plotly_chart(get_charts(), use_container_width=True)
 
 
-    # hist_data = [df[colname]]
 
+# line_break()
 
-    # group_labels = ['distplot']
 
 
-    # fig = ff.create_distplot(
+# with tab3:
 
-    # 	hist_data = hist_data, 
 
-    # 	group_labels = group_labels, 
+	# Some KDE Plots
 
-    # 	curve_type='kde',
 
-    # 	show_rug = False
+	# Rolling Mean (No. of Ride Cancellations)
 
-    # )
 
+	# # line_break()
 
-    # add the kernel density estimate plot
 
-    # fig.add_trace(
+	# num_orders_df = ords_df.groupby(
 
+	# 		['booking_hour'],
 
-    #     go.Histogram(
+	# 		as_index=False,
 
+	# 		dropna=False
 
-    #         x=df[colname],
+	# ).agg(
 
+	# 		{"order_gk": pd.Series.nunique}
 
-    #         histnorm='probability',
+	# ).sort_values(
 
 
-    #         name=f'{colname} KDE Plot'
+	# 		by=['booking_hour'],
 
 
-    #         # text = df[colname]
+	# 		ascending=[True]
 
 
-    #     )
+	# )
 
 
-    # )
 
+	# num_orders_df.columns = ['hour', 'cancelled_orders']
 
-    fig = exp.histogram(
 
-    	df, 
+	# num_orders_df['rolling_avg'] = num_orders_df.cancelled_orders.rolling(
 
-    	x = colname, 
+	# 		window = 4,
 
-    	color = 'is_driver_assigned_key',
+	# 		center = True
 
-    	histnorm = 'probability',
+	# 	).mean()
 
-    	# nbins = 26,
 
-    	cumulative = False
+	# st.dataframe(num_orders_df)
 
-    )
 
+	# line_break()
 
-    fig.update_xaxes(title=f'{colname}')
 
+	# # Let's Plot a Line Chart
 
-    fig.update_yaxes(title='Probability')
 
 
-    texttemp = "<b>%{y:.3f}</b>"
+	# fig = go.Figure()
 
 
-    hovertemp = "<br><br>".join(
 
+	# fig.add_trace(
 
-        [
+	# 	go.Scatter(
 
-        		f"<b>{colname}: </b>" + "<b>%{x}</b>",
+	# 		x = num_orders_df.hour, 
 
+	# 		y = num_orders_df.cancelled_orders, 
 
-            "<b>%{y:.3f}</b><extra></extra>"
-        ]
+	# 		text = num_orders_df.cancelled_orders, 
 
+	# 		mode = 'lines+markers',
 
-    )
+	# 		name = 'Normal'
 
+	# 	)
 
-    fig.update_traces(
+	# )
 
 
-        hovertemplate=hovertemp
 
+	# fig.add_trace(
 
-        # texttemplate = texttemp,
+	# 	go.Scatter(
 
+	# 		x = num_orders_df.hour, 
 
-        # textposition = 'outside'
+	# 		y = num_orders_df.rolling_avg, 
 
+	# 		mode = 'lines+markers', 
 
-    )
+	# 		text = num_orders_df.rolling_avg,
 
+	# 		name = 'Rolling Average'
 
-    # fig.update_traces(
+	# 	)
 
-    # 	bar = dict(
+	# )
 
-    # 		color = 'Blue'
 
-    # 		)
 
-    # )
+	# hovertemp = "<br><br>".join(
 
+	# 	[
 
-    st.plotly_chart(fig, use_container_width = True)
+	# 		"<b>Hour: %{x}</b>", 
 
-    # fig.show()
 
+	# 		"<b>Cancellations: %{y:,.0f}</b><extra></extra>"
 
-get_kde_plotly(ords_df, 'booking_hour')
+	# 	]
+
+	# )
+
+
+
+	# texttemp = "<b>%{y:,.0f}</b>"
+
+
+	# fig.update_traces(
+
+	# 	hovertemplate = hovertemp, 
+
+	# 	texttemplate = texttemp, 
+
+	# 	textposition = 'top center'
+
+	# )
+
+
+
+	# fig.update_layout(
+
+	# 	title = dict(
+
+	# 		text = "Ride Cancellations by Hour\n", 
+
+	# 		font = dict(size = 25)
+
+	# 	)
+
+	# )
+
+
+
+
+	# st.plotly_chart(fig, use_container_width = True)
+
+
+
+
+	# line_break()
+
+
+
+	# # Plotly Histogram Function
+
+
+	# def get_kde_plotly(df, colname):
+
+	# 		# Booking Hour KDE Plot
+
+	# 		# fig = go.Figure()
+
+
+	# 		# hist_data = [df[colname]]
+
+
+	# 		# group_labels = ['distplot']
+
+
+	# 		# fig = ff.create_distplot(
+
+	# 		# 	hist_data = hist_data, 
+
+	# 		# 	group_labels = group_labels, 
+
+	# 		# 	curve_type='kde',
+
+	# 		# 	show_rug = False
+
+	# 		# )
+
+
+	# 		# add the kernel density estimate plot
+
+	# 		# fig.add_trace(
+
+
+	# 		#     go.Histogram(
+
+
+	# 		#         x=df[colname],
+
+
+	# 		#         histnorm='probability',
+
+
+	# 		#         name=f'{colname} KDE Plot'
+
+
+	# 		#         # text = df[colname]
+
+
+	# 		#     )
+
+
+	# 		# )
+
+
+	# 		fig = exp.histogram(
+
+	# 			df, 
+
+	# 			x = colname, 
+
+	# 			color = 'is_driver_assigned_key',
+
+	# 			histnorm = 'probability',
+
+	# 			# nbins = 26,
+
+	# 			cumulative = False
+
+	# 		)
+
+
+	# 		fig.update_xaxes(title=f'{colname}')
+
+
+	# 		fig.update_yaxes(title='Probability')
+
+
+	# 		texttemp = "<b>%{y:.3f}</b>"
+
+
+	# 		hovertemp = "<br><br>".join(
+
+
+	# 				[
+
+	# 						f"<b>{colname}: </b>" + "<b>%{x}</b>",
+
+
+	# 						"<b>%{y:.3f}</b><extra></extra>"
+	# 				]
+
+
+	# 		)
+
+
+	# 		fig.update_traces(
+
+
+	# 				hovertemplate=hovertemp
+
+
+	# 				# texttemplate = texttemp,
+
+
+	# 				# textposition = 'outside'
+
+
+	# 		)
+
+
+	# 		# fig.update_traces(
+
+	# 		# 	bar = dict(
+
+	# 		# 		color = 'Blue'
+
+	# 		# 		)
+
+	# 		# )
+
+
+	# 		st.plotly_chart(fig, use_container_width = True)
+
+	# 		# fig.show()
+
+
+	# get_kde_plotly(ords_df, 'booking_hour')
+
+
+
+
+with tab2:
+
+
+	# Hexbin Plotly Maps
+
+
+	# Set Mapbox Access Token
+
+
+	exp.set_mapbox_access_token(st.secrets["mapbox_access_token"])
+
+
+
+	# Preparing DataFrame 
+
+
+	coord_grp = 	ords_df.groupby(
+
+				['origin_longitude', 'origin_latitude'], 
+
+				as_index  = False, 
+
+				dropna = False
+
+
+		).agg(
+
+			{"order_gk": pd.Series.nunique}
+
+
+		).sort_values(
+
+			by = ['order_gk'], 
+
+			ascending = False
+
+		).reset_index(drop = True)
+
+
+
+	coord_grp.order_gk = coord_grp.order_gk.apply(
+
+		lambda x: 0 if 'nan' in str(x).lower() else x
+
+		)
+
+
+
+	coord_grp.columns = ['origin_longitude', 'origin_latitude', 'cancellations']
+
+
+	coord_grp['cancellations_cumsum'] = coord_grp.cancellations.cumsum()
+
+
+	coord_grp['%_of_all_orders'] = coord_grp.cancellations_cumsum.apply(
+
+		lambda x: round(x / len(ords_df), 2)
+
+		)
+
+
+
+	coord_grp = coord_grp.reset_index(drop = True)
+
+
+
+	# st.write(len(coord_grp[coord_grp['%_of_all_orders'] <= 0.8]))
+
+
+
+	# Hexbin Map
+
+
+	fig = ff.create_hexbin_mapbox(
+
+		data_frame = coord_grp, 
+
+		lat = 'origin_latitude', 
+
+		lon = 'origin_longitude', 
+
+		nx_hexagon = 8,
+
+		opacity = 0.70,
+
+		labels = {"color": 'Ride Cancellations'},
+
+		min_count = 1,
+
+		color_continuous_scale = exp.colors.sequential.Oranges
+
+		# show_original_data = True,
+
+		# original_data_marker = dict(size = 6, opacity = 0.7, color = 'deeppink')
+
+
+	)
+
+
+	hovertemp = '<b>Ride Cancellations = %{z:,.0f}</b><extra></extra>'
+
+
+
+	fig.update_traces(hovertemplate = hovertemp)
+
+
+
+	fig.update_layout(mapbox_style= "carto-positron")
+
+
+
+	fig.update_layout(
+
+
+		title = dict(
+
+
+				text = "Ride Cancellations Hexbin Map", 
+
+
+				x = 0.43,
+
+
+				xanchor = 'center',
+
+
+				yanchor = 'top',
+
+
+				font=dict(size = 23)
+
+		
+
+			)
+
+
+		)
+
+
+
+	fig.update_layout(height = 500)
+
+
+
+	st.plotly_chart(fig, use_container_width = True)
+
 
 
 
@@ -1488,7 +1826,7 @@ get_kde_plotly(ords_df, 'booking_hour')
 
 def styling_func():
 
-    css = '''
+		css = '''
 
 
 		div[class^='st-emotion-cache-16txtl3'] { 
@@ -1502,53 +1840,53 @@ def styling_func():
 
 		div[class^='block-container'] { 
 
-		  padding-top: 1rem; 
+			padding-top: 1rem; 
 
 		}
 
 
 		[data-testid="stMetric"] {
-		    width: fit-content;
-		    margin: auto;
+				width: fit-content;
+				margin: auto;
 		}
 
 		[data-testid="stMetric"] > div {
-		    width: fit-content;
-		    margin: auto;
+				width: fit-content;
+				margin: auto;
 		}
 
 		[data-testid="stMetric"] label {
-		    width: fit-content;
-		    margin: auto;
+				width: fit-content;
+				margin: auto;
 		}
 
 
 		[data-testid="stMarkdownContainer"] > p {
 
-          font-weight: bold;
+					font-weight: bold;
 
-        }
+				}
 
 
-        [data-testid="stMetricValue"] {
+				[data-testid="stMetricValue"] {
 
-          font-weight: bold;
-          
-        }
+					font-weight: bold;
+					
+				}
 
 
 	'''
 
-    st.write(
+		st.write(
 
 
-        f"<style>{css}</style>",
+				f"<style>{css}</style>",
 
 
-        unsafe_allow_html=True
+				unsafe_allow_html=True
 
 
-    )
+		)
 
 
 styling_func()
