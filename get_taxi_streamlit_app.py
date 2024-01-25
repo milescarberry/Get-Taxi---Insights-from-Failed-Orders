@@ -56,6 +56,22 @@ sns.set_style('darkgrid')
 sns.set_context('paper', font_scale=1.4)
 
 
+# Refresh app at every 60 minutes
+
+
+refresh_count = st_autorefresh(
+
+	# interval = 6 * 60 * 60 * 1000,
+
+	interval=3600000,
+
+	key="dataframerefresh"
+
+)
+
+
+
+
 # HTML Line Break Function
 
 
