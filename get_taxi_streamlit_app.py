@@ -2134,7 +2134,7 @@ with tab3:
 
 
 
-	st.markdown('''### By Driver Assigned For Orders That Were Cancelled By Client''')
+	st.markdown('''### Ride Cancellations By Driver Assigned For Orders That Were Cancelled By Client''')
 
 
 
