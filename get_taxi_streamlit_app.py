@@ -2268,7 +2268,7 @@ with tab3:
 
   - In the latter case too we get to see a spike at 8 am with a steady increase in cancellations from 11 am till 5 pm. We also get see a growth in cancellations from 10 pm to 11 pm and then a decline until 5 am.
 
-  - We can draw a conclusion from the above chart that rides that have a driver assigned to them are less likely to get cancelled by the client and vice versa.
+  - We can draw a conclusion from the above chart that rides having a driver assigned to them are less likely to get cancelled by the client and vice versa.
 
   - Long arrival times are likely the main reason clients cancel rides when a driver is assigned. They may not want to wait an excessive amount of time, especially when they are in a hurry.
 
