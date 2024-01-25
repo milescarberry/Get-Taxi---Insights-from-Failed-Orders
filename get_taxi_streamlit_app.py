@@ -2685,6 +2685,10 @@ with tab3:
 
   - The peaks at 8 am and 5 pm likely coincide with morning and evening rush hours, when road traffic significantly increases.
 
+  - According to a study done by technology specialist TomTom, Reading (the location from where the dataset is acquired) is the 10th most congested place for traffic in the UK in its ninth Traffic Index.
+
+  - The study also mentions that the worst times to drive in Reading is between 8am and 9am on Tuesdays, when it is most congested.
+
 
 	'''
 
