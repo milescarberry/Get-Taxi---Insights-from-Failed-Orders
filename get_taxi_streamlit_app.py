@@ -1497,28 +1497,11 @@ with tab3:
 
 	line_break()
 
+
 	st.markdown("Firstly, let's take a look at this table: ")
 
+
 	line_break()
-
-
-	od_df = od_df.reset_index(drop = True)
-
-
-	drop_indices = od_df[
-
-			(od_df.order_status_key == 'Cancelled By System') & 
-
-			(od_df.is_driver_assigned_key == 'Yes')
-
-	].index.values 
-
-
-
-	od_df = od_df[~od_df.index.isin(drop_indices)]
-
-
-	od_df = od_df.reset_index(drop = True)
 
 
 	grp_df = od_df.groupby(
@@ -1636,16 +1619,25 @@ with tab3:
 
 
 
-	# od_df = od_df[
+	od_df = od_df.reset_index(drop = True)
 
 
-	# 	(orders_df.order_status_key != 'Cancelled By System') & 
+	drop_indices = od_df[
+
+			(od_df.order_status_key == 'Cancelled By System') & 
+
+			(od_df.is_driver_assigned_key == 'Yes')
+
+	].index.values 
 
 
-	# 	(orders_df.is_driver_assigned_key != 'Yes')
+
+	od_df = od_df[~od_df.index.isin(drop_indices)]
 
 
-	# ]	
+
+	od_df = od_df.reset_index(drop = True)
+
 
 
 
