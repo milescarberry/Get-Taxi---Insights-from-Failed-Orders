@@ -1497,7 +1497,7 @@ with tab3:
 
 	line_break()
 
-	st.markdown("Let's take a look at this table: ")
+	st.markdown("Firstly, let's take a look at this table: ")
 
 	line_break()
 
