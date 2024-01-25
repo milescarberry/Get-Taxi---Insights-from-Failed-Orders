@@ -1463,7 +1463,7 @@ with tab3:
 	line_break()
 
 
-	intro_text = "Gett, previously known as GetTaxi, is an Israeli-developed technology platform solely focused on corporate Ground Transportation Management (GTM).\nThey have an application where clients can order taxis, and drivers can accept their rides (offers).\nAt the moment, when the client clicks the Order button in the application, the matching system searches for the most relevant drivers and offers them the order.\nWe are investigating some matching metrics for orders that did not completed successfully, i.e. the customer didn't end up getting a car."
+	intro_text = "Gett, previously known as GetTaxi, is an Israeli-developed technology platform solely focused on corporate Ground Transportation Management (GTM).\nThey have an application where clients can order taxis, and drivers can accept their rides (offers).\nAt the moment, when the client clicks the Order button in the application, the matching system searches for the most relevant drivers and offers them the order.\nWe are investigating some matching metrics for orders that did not completed successfully, i.e. the customer didn't end up getting a ride."
 
 
 	html_para(text = intro_text)
