@@ -2504,7 +2504,7 @@ with tab3:
   - The mean cancellation time is the maximum at 5 am and is the lowest at hours 7 and 8 in cases where a driver is assigned. This is followed by a peak at 11 am then a decline until 3 pm and again an incline until 6 pm. The mean cancellation time dips again at 7 pm followed by a steady increase until 11 pm. This is followed by peaks until 3 am.
 
 
-  - In the case of ride cancellations where a driver is not assigned, the mean cancellation time is the maximum at 4 pm followed by peaks at 11 pm and from 5 am to 9 am. It reaches its lowest point at 10am and then gradually rises hitting a maximum at 4pm.
+  - In the case of ride cancellations where a driver is not assigned, the mean cancellation time is the maximum at 4 pm followed by peaks at 11 pm and from 5 am to 9 am. It reaches its lowest point at 10 am and then gradually rises hitting a maximum at 4 pm.
 
 
 	'''
