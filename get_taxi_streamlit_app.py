@@ -1979,7 +1979,7 @@ with tab3:
 
 
 
-	st.markdown("### By Order Status")
+	st.markdown("### Ride Cancellations By Order Status")
 
 
 
