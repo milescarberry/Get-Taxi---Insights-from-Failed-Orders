@@ -36,7 +36,7 @@ import datetime as dt
 st.set_page_config(
 
 
-		page_title="GetTaxi - Insights from Failed Orders",
+		page_title="Gett - Insights from Failed Orders",
 
 
 		layout='wide'
@@ -70,14 +70,18 @@ def line_break():
 def html_para(text = ''):
 
 
-	return f"<p style='text-align:center;line-height: 2.0;'>{text}</p>"
+	# return f"<p style='text-align:center;line-height: 2.0;'>{text}</p>"
+
+
+	return st.write(f"<p style='line-height: 2.0;'>{text}</p>", unsafe_allow_html = True)
+
 
 
 
 # Dashboard Title
 st.write(
 
-		"<h1><center>Title</center></h1>",
+		"<h1><center>Gett - Insights from Failed Orders</center></h1>",
 
 
 		unsafe_allow_html=True
@@ -87,22 +91,22 @@ st.write(
 
 
 st.write("<br>", unsafe_allow_html=True)
+
 
 
 # Some More Text
 
 
-st.write(
+# st.write(
 
-		"<h5><center>Some more text comes here.</center></h5>",
+# 		"<h5><center>Some more text comes here.</center></h5>",
 
-		unsafe_allow_html=True
+# 		unsafe_allow_html=True
 
-)
+# )
 
 
-st.write("<br>", unsafe_allow_html=True)
-
+# st.write("<br>", unsafe_allow_html=True)
 
 
 
@@ -1462,16 +1466,22 @@ with tab3:
 	intro_text = "Gett, previously known as GetTaxi, is an Israeli-developed technology platform solely focused on corporate Ground Transportation Management (GTM).\nThey have an application where clients can order taxis, and drivers can accept their rides (offers).\nAt the moment, when the client clicks the Order button in the application, the matching system searches for the most relevant drivers and offers them the order.\nWe are investigating some matching metrics for orders that did not completed successfully, i.e. the customer didn't end up getting a car."
 
 
-
-	st.markdown(
-
-		f"**{intro_text}**", 
-
-		unsafe_allow_html = True
-
-	)
+	html_para(text = intro_text)
 
 
+	# st.markdown(
+
+	# 	f"**{intro_text}**", 
+
+	# 	unsafe_allow_html = True
+
+	# )
+
+
+
+	line_break()
+
+	st.markdown("Let's take a look at this table: ")
 
 	line_break()
 
