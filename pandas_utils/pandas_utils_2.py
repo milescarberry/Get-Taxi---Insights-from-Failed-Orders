@@ -14,8 +14,185 @@ import datetime as dt
 
 from math import radians, cos, sin, asin, sqrt
 
+
+from bardapi import Bard
+
+
 import streamlit as st
 
+
+
+
+# Bard API Get Response
+
+
+def bard_api_response(query):
+
+
+    bard = Bard(token = st.secrets['bard_api_token'])
+
+
+    image = open('./images/dual_y_axes.png', 'rb').read()   # (jpeg, png, webp) are supported.
+
+
+    bard_answer = bard.ask_about_image(query, image)
+
+
+    return str(bard_answer['content']).strip()
+
+
+
+
+def get_kde_plotly(df, colname):
+
+    # Booking Hour KDE Plot
+
+    # fig = go.Figure()
+
+
+    # hist_data = [df[colname]]
+
+
+    # group_labels = ['distplot']
+
+
+    # fig = ff.create_distplot(
+
+    #   hist_data = hist_data, 
+
+    #   group_labels = group_labels, 
+
+    #   curve_type='kde',
+
+    #   show_rug = False
+
+    # )
+
+
+    # add the kernel density estimate plot
+
+    # fig.add_trace(
+
+
+    #     go.Histogram(
+
+
+    #         x=df[colname],
+
+
+    #         histnorm='probability',
+
+
+    #         name=f'{colname} KDE Plot'
+
+
+    #         # text = df[colname]
+
+
+    #     )
+
+
+    # )
+
+
+    fig = exp.histogram(
+
+        df, 
+
+        x = colname, 
+
+        color = 'is_driver_assigned_key',
+
+        histnorm = 'probability',
+
+        # nbins = 26,
+
+        cumulative = True
+
+    )
+
+
+    fig.update_xaxes(title=f'{colname}')
+
+
+    fig.update_yaxes(title='Probability')
+
+
+    texttemp = "<b>%{y:.3f}</b>"
+
+
+    hovertemp = "<br><br>".join(
+
+
+        [
+
+                f"<b>{colname}: </b>" + "<b>%{x}</b>",
+
+
+            "<b>%{y:.3f}</b><extra></extra>"
+        ]
+
+
+    )
+
+
+    fig.update_traces(
+
+
+        hovertemplate=hovertemp
+
+
+        # texttemplate = texttemp,
+
+
+        # textposition = 'outside'
+
+
+    )
+
+
+    # fig.update_traces(
+
+    #   bar = dict(
+
+    #       color = 'Blue'
+
+    #       )
+
+    # )
+
+
+    st.plotly_chart(fig, use_container_width = True)
+
+    # fig.show()
+
+
+
+
+
+
+def first_date_of_quarter(date):
+
+    month = date.month
+
+    year = date.year
+    
+    if month >= 1 and month <= 3:
+        quarter_start_month = 1
+        quarter_start_year = year
+    elif month >= 4 and month <= 6:
+        quarter_start_month = 4
+        quarter_start_year = year
+    elif month >= 7 and month <= 9:
+        quarter_start_month = 7
+        quarter_start_year = year
+    else:
+        quarter_start_month = 10
+        quarter_start_year = year
+    
+    first_date = dt.date(quarter_start_year, quarter_start_month, 1)
+    
+    return first_date
 
 
 
@@ -40,7 +217,7 @@ def show_nan(df, nan_criteria = 'nan'):
     fig.update_layout(bargap = 0.32)
     
     
-    st.plotly_chart(fig)
+    fig.show()
     
     
     return None
@@ -153,7 +330,7 @@ def get_value_counts(df, colname):
 #     fig.update_traces(textposition = 'outside')
     
     
-    st.plotly_chart(fig)
+    fig.show()
     
 
 
@@ -214,7 +391,7 @@ def stacked_bar_chart_ci(df, colname1, colname2, colname3):
     ).agg(
 
 
-        {"order_gk": pd.Series.count}
+        {"quantity_litres": pd.Series.count}
 
 
     )
@@ -237,7 +414,7 @@ def stacked_bar_chart_ci(df, colname1, colname2, colname3):
         dropna = False).agg(
 
 
-        {"order_gk": pd.Series.count}
+        {"quantity_litres": pd.Series.count}
 
 
     )
@@ -368,7 +545,7 @@ def stacked_bar_chart_ci(df, colname1, colname2, colname3):
             "<b>%{x} %</b>",
 
 
-            "<b>%{customdata[1]} out of %{customdata[3]} cases</b><extra></extra>"
+            "<b>%{customdata[1]} out of %{customdata[3]} flats</b><extra></extra>"
 
         ]
 
@@ -403,7 +580,7 @@ def stacked_bar_chart_ci(df, colname1, colname2, colname3):
 
 
     
-    st.plotly_chart(fig)
+    fig.show()
 
 
 
@@ -427,7 +604,7 @@ def stacked_bar_chart_ci_2(df, colname1, colname2):
     ).agg(
 
 
-        {"order_gk": pd.Series.count}
+        {"quantity_litres": pd.Series.count}
 
 
     )
@@ -450,7 +627,7 @@ def stacked_bar_chart_ci_2(df, colname1, colname2):
         dropna = False).agg(
 
 
-        {"order_gk": pd.Series.count}
+        {"quantity_litres": pd.Series.count}
 
 
     )
@@ -581,7 +758,7 @@ def stacked_bar_chart_ci_2(df, colname1, colname2):
             "<b>%{x} %</b>",
 
 
-            "<b>%{customdata[1]} out of %{customdata[3]} cases</b><extra></extra>"
+            "<b>%{customdata[1]} out of %{customdata[3]} flats</b><extra></extra>"
 
         ]
 
@@ -616,7 +793,7 @@ def stacked_bar_chart_ci_2(df, colname1, colname2):
 
 
     
-    st.plotly_chart(fig)
+    fig.show()
 
 
 
@@ -641,7 +818,7 @@ def stacked_bar_chart_ci_4(df, colname1, colname2, colname3, colname4):
     ).agg(
 
 
-        {"order_gk": pd.Series.count}
+        {"quantity_litres": pd.Series.count}
 
 
     )
@@ -664,7 +841,7 @@ def stacked_bar_chart_ci_4(df, colname1, colname2, colname3, colname4):
         dropna = False).agg(
 
 
-        {"order_gk": pd.Series.count}
+        {"quantity_litres": pd.Series.count}
 
 
     )
@@ -802,7 +979,7 @@ def stacked_bar_chart_ci_4(df, colname1, colname2, colname3, colname4):
             "<b>%{x} %</b>",
 
 
-            "<b>%{customdata[1]} out of %{customdata[3]} cases</b><extra></extra>"
+            "<b>%{customdata[1]} out of %{customdata[3]} flats</b><extra></extra>"
 
         ]
 
@@ -837,7 +1014,7 @@ def stacked_bar_chart_ci_4(df, colname1, colname2, colname3, colname4):
 
 
     
-    st.plotly_chart(fig)
+    fig.show()
 
 
 
@@ -956,7 +1133,7 @@ def estimator_bar_chart(df, estimator, colname1, colname2, colname3):
         fig.update_layout(height = 1000, width = 800)
 
 
-        st.plotly_chart(fig)
+        fig.show()
 
 
     
@@ -1065,7 +1242,7 @@ def estimator_bar_chart(df, estimator, colname1, colname2, colname3):
         fig.update_layout(height = 1000, width = 800)
 
 
-        st.plotly_chart(fig)
+        fig.show()
 
     
     
@@ -1175,7 +1352,7 @@ def estimator_bar_chart(df, estimator, colname1, colname2, colname3):
         fig.update_layout(height = 1000, width = 800)
 
 
-        st.plotly_chart(fig)
+        fig.show()
 
     
     
@@ -1294,7 +1471,7 @@ def estimator_bar_chart_2(df, estimator, colname1, colname2):
             fig.update_layout(height = 1000, width = 800)
 
 
-            st.plotly_chart(fig)
+            fig.show()
 
             
 
@@ -1403,7 +1580,7 @@ def estimator_bar_chart_2(df, estimator, colname1, colname2):
             fig.update_layout(height = 1000, width = 800)
 
 
-            st.plotly_chart(fig)
+            fig.show()
 
 
         
@@ -1512,7 +1689,7 @@ def estimator_bar_chart_2(df, estimator, colname1, colname2):
             fig.update_layout(height = 1000, width = 800)
 
 
-            st.plotly_chart(fig)
+            fig.show()
 
         
         
@@ -1631,7 +1808,7 @@ def estimator_bar_chart_4(df, estimator, colname1, colname2, colname3, colname4)
         fig.update_layout(height = 1000, width = 800)
 
 
-        st.plotly_chart(fig)
+        fig.show()
     
     
     elif estimator.lower().strip() == 'median':
@@ -1739,7 +1916,7 @@ def estimator_bar_chart_4(df, estimator, colname1, colname2, colname3, colname4)
         fig.update_layout(height = 1000, width = 800)
 
 
-        st.plotly_chart(fig)
+        fig.show()
 
 
 
@@ -1847,7 +2024,7 @@ def estimator_bar_chart_4(df, estimator, colname1, colname2, colname3, colname4)
         fig.update_layout(height = 1000, width = 800)
 
 
-        st.plotly_chart(fig)
+        fig.show()
 
         
     
@@ -1970,7 +2147,7 @@ def estimator_bar_chart_2(df, estimator, colname1, colname2):
             fig.update_layout(height = 1000, width = 800)
 
 
-            st.plotly_chart(fig)
+            fig.show()
 
             
 
@@ -2079,7 +2256,7 @@ def estimator_bar_chart_2(df, estimator, colname1, colname2):
             fig.update_layout(height = 1000, width = 800)
 
 
-            st.plotly_chart(fig)
+            fig.show()
 
 
         
@@ -2188,7 +2365,7 @@ def estimator_bar_chart_2(df, estimator, colname1, colname2):
             fig.update_layout(height = 1000, width = 800)
 
 
-            st.plotly_chart(fig)
+            fig.show()
 
         
         
@@ -2307,7 +2484,7 @@ def estimator_bar_chart_4(df, estimator, colname1, colname2, colname3, colname4)
         fig.update_layout(height = 1000, width = 800)
 
 
-        st.plotly_chart(fig)
+        fig.show()
     
     
     elif estimator.lower().strip() == 'median':
@@ -2415,7 +2592,7 @@ def estimator_bar_chart_4(df, estimator, colname1, colname2, colname3, colname4)
         fig.update_layout(height = 1000, width = 800)
 
 
-        st.plotly_chart(fig)
+        fig.show()
 
 
 
@@ -2523,7 +2700,7 @@ def estimator_bar_chart_4(df, estimator, colname1, colname2, colname3, colname4)
         fig.update_layout(height = 1000, width = 800)
 
 
-        st.plotly_chart(fig)
+        fig.show()
 
         
     

@@ -32,10 +32,11 @@ from streamlit_autorefresh import st_autorefresh
 import datetime as dt
 
 
+
 st.set_page_config(
 
 
-		page_title="Page Title",
+		page_title="GetTaxi - Insights from Failed Orders",
 
 
 		layout='wide'
@@ -61,6 +62,16 @@ sns.set_context('paper', font_scale=1.4)
 def line_break():
 
 		return st.write("<br>", unsafe_allow_html=True)
+
+
+# HTML Para Function
+
+
+def html_para(text = ''):
+
+
+	return f"<p style='text-align:center;line-height: 2.0;'>{text}</p>"
+
 
 
 # Dashboard Title
@@ -91,6 +102,9 @@ st.write(
 
 
 st.write("<br>", unsafe_allow_html=True)
+
+
+
 
 
 # Get Data
@@ -404,11 +418,14 @@ with st.sidebar:
 
 				st.session_state.is_driver_assigned = is_driver_keys
 
+
 	# Hours Slider
+
 
 		def change_hours_sel():
 
 				st.session_state.hours = st.session_state.new_hours
+
 
 		hours_sel = st.slider(
 
@@ -525,6 +542,10 @@ with st.sidebar:
 # Applying Filters To DataFrame
 
 
+
+od_df = orders_df
+
+
 orders_df = orders_df[
 
 		(orders_df.order_status_key.isin(st.session_state.order_status)) &
@@ -613,9 +634,9 @@ line_break()
 # Creating Some Tabs
 
 
-tab1, tab2 = st.tabs(
+tab1, tab2, tab3 = st.tabs(
 
-	['Dual Y-Axes Chart by Hour', 'Ride Cancellations Hexbin Map']
+	['Dual Y-Axes Chart by Hour', 'Ride Cancellations Hexbin Map', 'Analysis']
 
 )
 
@@ -628,181 +649,192 @@ tab1, tab2 = st.tabs(
 # Creating Aggregated DataFrame By Hour
 
 
-hours = []
+def get_aggregated_df(orders_df = orders_df):
 
 
-minutes = []
 
+	hours = []
 
-for i in range(0, 24):
 
-		for j in range(0, 60):
+	minutes = []
 
-				hours.append(i)
 
-				minutes.append(j)
+	for i in range(0, 24):
 
+			for j in range(0, 60):
 
-_ = pd.DataFrame()
+					hours.append(i)
 
+					minutes.append(j)
 
-_['hour'] = hours
 
+	_ = pd.DataFrame()
 
-_['minute'] = minutes
 
+	_['hour'] = hours
 
-_avg_m_order_eta = []
 
+	_['minute'] = minutes
 
-_avg_cancellation_minutes = []
 
+	_avg_m_order_eta = []
 
-_sum_cancellations = []
 
+	_avg_cancellation_minutes = []
 
-_avg_num_offers_applied = []
 
+	_sum_cancellations = []
 
-for i in range(len(_)):
 
-		mean_m_order_eta = orders_df[
+	_avg_num_offers_applied = []
 
 
-				(orders_df.booking_hour == _.iloc[i, ::1][0]) &
+	for i in range(len(_)):
 
+			mean_m_order_eta = orders_df[
 
-				(orders_df.booking_minute == _.iloc[i, ::1][1])
 
-		].m_order_eta.mean()
+					(orders_df.booking_hour == _.iloc[i, ::1][0]) &
 
-		mean_cancellations_time = orders_df[
 
+					(orders_df.booking_minute == _.iloc[i, ::1][1])
 
-				(orders_df.booking_hour == _.iloc[i, ::1][0]) &
+			].m_order_eta.mean()
 
+			mean_cancellations_time = orders_df[
 
-				(orders_df.booking_minute == _.iloc[i, ::1][1])
 
+					(orders_df.booking_hour == _.iloc[i, ::1][0]) &
 
-		].cancellations_time_in_minutes.mean()
 
-		mean_num_offers_applied = orders_df[
+					(orders_df.booking_minute == _.iloc[i, ::1][1])
 
 
-				(orders_df.booking_hour == _.iloc[i, ::1][0]) &
+			].cancellations_time_in_minutes.mean()
 
+			mean_num_offers_applied = orders_df[
 
-				(orders_df.booking_minute == _.iloc[i, ::1][1])
 
+					(orders_df.booking_hour == _.iloc[i, ::1][0]) &
 
-		].num_offers_applied.mean()
 
-		sum_order_cancellations = orders_df[
+					(orders_df.booking_minute == _.iloc[i, ::1][1])
 
 
-				(orders_df.booking_hour == _.iloc[i, ::1][0]) &
+			].num_offers_applied.mean()
 
+			sum_order_cancellations = orders_df[
 
-				(orders_df.booking_minute == _.iloc[i, ::1][1])
 
+					(orders_df.booking_hour == _.iloc[i, ::1][0]) &
 
-		].order_gk.nunique()
 
-		_avg_m_order_eta.append(mean_m_order_eta)
+					(orders_df.booking_minute == _.iloc[i, ::1][1])
 
-		_avg_cancellation_minutes.append(mean_cancellations_time)
 
-		_avg_num_offers_applied.append(mean_num_offers_applied)
+			].order_gk.nunique()
 
-		_sum_cancellations.append(sum_order_cancellations)
+			_avg_m_order_eta.append(mean_m_order_eta)
 
+			_avg_cancellation_minutes.append(mean_cancellations_time)
 
-_['mean_m_order_eta'] = _avg_m_order_eta
+			_avg_num_offers_applied.append(mean_num_offers_applied)
 
+			_sum_cancellations.append(sum_order_cancellations)
 
-_['mean_cancellations_time_in_mins'] = _avg_cancellation_minutes
 
+	_['mean_m_order_eta'] = _avg_m_order_eta
 
-_['mean_num_offers_applied'] = _avg_num_offers_applied
 
+	_['mean_cancellations_time_in_mins'] = _avg_cancellation_minutes
 
-_['total_order_cancellations'] = _sum_cancellations
 
+	_['mean_num_offers_applied'] = _avg_num_offers_applied
 
-# Applying Hours Filter To _ DataFrame
 
+	_['total_order_cancellations'] = _sum_cancellations
 
-st_time = st.session_state.hours[0]
 
-en_time = st.session_state.hours[1]
+	# Applying Hours Filter To _ DataFrame
 
 
-_ = _[
+	st_time = st.session_state.hours[0]
 
-		(_.hour >= st_time.hour) &
+	en_time = st.session_state.hours[1]
 
 
-		(_.hour <= en_time.hour)
+	_ = _[
 
-]
+			(_.hour >= st_time.hour) &
 
 
-_ = _.reset_index(drop=True)
+			(_.hour <= en_time.hour)
 
+	]
 
-_['time'] = _.apply(lambda x: dt.time(int(x[0]), int(x[1])), axis=1)
 
+	_ = _.reset_index(drop=True)
 
-_ = _.reindex(columns=[
 
-		"time",
-		"hour",
-		"minute",
-		"mean_m_order_eta",
-		"mean_cancellations_time_in_mins",
-		"mean_num_offers_applied",
-		"total_order_cancellations"
+	_['time'] = _.apply(lambda x: dt.time(int(x[0]), int(x[1])), axis=1)
 
-]
 
+	_ = _.reindex(columns=[
 
-)
+			"time",
+			"hour",
+			"minute",
+			"mean_m_order_eta",
+			"mean_cancellations_time_in_mins",
+			"mean_num_offers_applied",
+			"total_order_cancellations"
 
+	]
 
-_ = _.groupby(['hour'], as_index=False, dropna=False).agg(
 
-		{
+	)
 
-				"mean_m_order_eta": pd.Series.mean,
 
-				"mean_cancellations_time_in_mins": pd.Series.mean,
+	_ = _.groupby(['hour'], as_index=False, dropna=False).agg(
 
-				"mean_num_offers_applied": pd.Series.mean,
+			{
 
-				"total_order_cancellations": pd.Series.sum
+					"mean_m_order_eta": pd.Series.mean,
 
-		}
+					"mean_cancellations_time_in_mins": pd.Series.mean,
 
+					"mean_num_offers_applied": pd.Series.mean,
 
-)
+					"total_order_cancellations": pd.Series.sum
 
+			}
 
-_.mean_num_offers_applied = _.mean_num_offers_applied.round(0)
 
+	)
 
-_['time'] = _['hour'].apply(lambda x: dt.datetime.strftime(
 
+	_.mean_num_offers_applied = _.mean_num_offers_applied.round(0)
 
-		dt.datetime(1990, 6, 1, int(x), 0),
 
+	_['time'] = _['hour'].apply(lambda x: dt.datetime.strftime(
 
-		"%H:%M"
 
+			dt.datetime(1990, 6, 1, int(x), 0),
 
-)
 
-)
+			"%H:%M"
+
+
+	)
+
+	)
+
+	return _ 
+
+
+
+_ = get_aggregated_df(orders_df = orders_df)
+
 
 
 # Get Secondary Y-Axis Charts Function
@@ -1214,6 +1246,42 @@ def get_charts():
 		)
 
 
+		# fig.write_image("images/dual_y_axes.png")
+
+
+		# if len(st.session_state.order_status) > 1:
+
+
+
+		# 	query = f'''
+
+		# 		Gett, previously known as GetTaxi, is an Israeli-developed technology platform solely focused on corporate Ground Transportation Management (GTM). 
+
+		# 		They have an application where clients can order taxis, and drivers can accept their rides (offers). 
+
+		# 		At the moment, when the client clicks the Order button in the application, the matching system searches for the most relevant drivers and offers them the order. 
+
+		# 		I am actually investigating some matching metrics for orders that did not completed successfully, i.e., the customer didn't end up getting a car.
+
+		# 		Please provide some valuable insights from this dual y-axes line chart where on the x-axis is the hour of the day, 
+
+		# 		the left y-axis shows the {st.session_state.left_y} and its line color is closer to #f8776c and the right y-axis shows 
+
+		# 		the {st.session_state.right_y} and its line color is closer to #a2a400. The x-axis ranges from {st.session_state.hours[0]} until {st.session_state.hours[1]}.
+
+		# 		Please note that the ride can either be cancelled by the system i.e. the application or by the client. Please note that the number of cancellations by client is far greater than the number of cancellations by the system.
+
+		# 		Also, the graph is based on the dataset that contains cancelled rides that had a driver assigned and vice versa.
+
+		# 		Now, without any formalities directly proceed with extracting some valuable insights from this provided chart.
+
+
+		# 	'''
+
+
+		# bard_text = bard_api_response(query = query)
+
+
 		return fig
 
 
@@ -1374,144 +1442,448 @@ with tab1:
 	# Display Secondary Y-Axis Plotly Line Chart
 
 
-	st.plotly_chart(get_charts(), use_container_width=True)
+	# charts = get_charts()
 
 
+	st.plotly_chart(get_charts(), use_container_width = True)
 
-# line_break()
 
 
 
-# with tab3:
+with tab3:
 
 
-	# Some KDE Plots
+	st.markdown("## Analysis")
 
 
-	# Rolling Mean (No. of Ride Cancellations)
+	line_break()
 
 
-	# # line_break()
+	intro_text = "Gett, previously known as GetTaxi, is an Israeli-developed technology platform solely focused on corporate Ground Transportation Management (GTM).\nThey have an application where clients can order taxis, and drivers can accept their rides (offers).\nAt the moment, when the client clicks the Order button in the application, the matching system searches for the most relevant drivers and offers them the order.\nWe are investigating some matching metrics for orders that did not completed successfully, i.e. the customer didn't end up getting a car."
 
 
-	# num_orders_df = ords_df.groupby(
 
-	# 		['booking_hour'],
+	st.markdown(
 
-	# 		as_index=False,
+		f"**{intro_text}**", 
 
-	# 		dropna=False
+		unsafe_allow_html = True
 
-	# ).agg(
+	)
 
-	# 		{"order_gk": pd.Series.nunique}
 
-	# ).sort_values(
 
+	line_break()
 
-	# 		by=['booking_hour'],
 
+	od_df = od_df.reset_index(drop = True)
 
-	# 		ascending=[True]
 
+	drop_indices = od_df[
 
-	# )
+			(od_df.order_status_key == 'Cancelled By System') & 
 
+			(od_df.is_driver_assigned_key == 'Yes')
 
+	].index.values 
 
-	# num_orders_df.columns = ['hour', 'cancelled_orders']
 
 
-	# num_orders_df['rolling_avg'] = num_orders_df.cancelled_orders.rolling(
+	od_df = od_df[~od_df.index.isin(drop_indices)]
 
-	# 		window = 4,
 
-	# 		center = True
+	od_df = od_df.reset_index(drop = True)
 
-	# 	).mean()
 
+	grp_df = od_df.groupby(
 
-	# st.dataframe(num_orders_df)
+		['is_driver_assigned_key', 'order_status_key'], 
 
+		as_index = False, 
 
-	# line_break()
+		dropna = False
 
+		).agg(
 
-	# # Let's Plot a Line Chart
+		{
 
+		"order_gk": pd.Series.nunique, 
 
+		"cancellations_time_in_minutes": pd.Series.mean, 
 
-	# fig = go.Figure()
+		"m_order_eta": pd.Series.mean
 
+		}
 
 
-	# fig.add_trace(
+	)
 
-	# 	go.Scatter(
 
-	# 		x = num_orders_df.hour, 
+	line_break()
 
-	# 		y = num_orders_df.cancelled_orders, 
 
-	# 		text = num_orders_df.cancelled_orders, 
+	grp_df['%_of_total'] = grp_df.order_gk.apply(
 
-	# 		mode = 'lines+markers',
+		lambda x: x / len(orders_df)
 
-	# 		name = 'Normal'
+	)
 
-	# 	)
 
-	# )
+	grp_df = grp_df.reindex(
 
+		columns = [
 
+		'is_driver_assigned_key', 
 
-	# fig.add_trace(
+		'order_status_key', 
 
-	# 	go.Scatter(
+		'order_gk', 
 
-	# 		x = num_orders_df.hour, 
+		'%_of_total', 
 
-	# 		y = num_orders_df.rolling_avg, 
+		'cancellations_time_in_minutes', 
 
-	# 		mode = 'lines+markers', 
+		'm_order_eta'
 
-	# 		text = num_orders_df.rolling_avg,
+		]
 
-	# 		name = 'Rolling Average'
+	)
 
-	# 	)
 
-	# )
+	grp_df.cancellations_time_in_minutes = grp_df.cancellations_time_in_minutes.round(1)
 
 
+	grp_df.m_order_eta = grp_df.m_order_eta.round(1)
 
-	# hovertemp = "<br><br>".join(
 
-	# 	[
+	grp_df['%_of_total'] = grp_df['%_of_total'].apply(lambda x: f"{x:.1%}")
 
-	# 		"<b>Hour: %{x}</b>", 
 
+	grp_df.columns = ['Is Driver Assigned?', 'Order Status', 'Number of Orders', '% of Total Orders', 'Mean Cancellation Time in Minutes', 'Mean Time Before Order Arrival']
 
-	# 		"<b>Cancellations: %{y:,.0f}</b><extra></extra>"
 
-	# 	]
 
-	# )
+	st.dataframe(grp_df, use_container_width = True, hide_index = True)
 
 
 
-	# texttemp = "<b>%{y:,.0f}</b>"
+	line_break()
 
 
-	# fig.update_traces(
 
-	# 	hovertemplate = hovertemp, 
+	table_exp_text = '''
 
-	# 	texttemplate = texttemp, 
+	The above table shows data on four types of orders:
 
-	# 	textposition = 'top center'
+	- Orders where no driver was assigned and the customer cancelled
 
-	# )
+	- Orders where no driver was assigned and the system cancelled
+
+	- Orders where a driver was assigned and the customer cancelled
+
+	- Orders where a driver was assigned and the system cancelled
+
+	<br>
+
+	Here are some key insights from the table:
+
+
+	- **Customer cancellations are more common than system cancellations.** For both assigned and 
+	unassigned driver orders, customer cancellations make up a larger percentage (68.2%) of the total cancelled orders.
+
+	- **Orders where a driver was assigned are less likely to be cancelled.** The percentage of orders that are cancelled are
+	lower when a driver is assigned (26.2%) compared to when no driver is assigned(73.8%).
+
+	- **Cancellation times are longer for orders where a driver is assigned.** The mean cancellation time is more
+	for orders where a driver is assigned (3.9 mins) compared to orders where a driver is not assigned (1.8 mins). Please note that the field **'Mean Cancellation Time In Minutes'**
+	is applicable only for orders that are cancelled by the client.
+
+	<br>
+
+	**Please Note:** We will be dropping the instances where an order is cancelled by the system and a driver is assigned to that order
+	since there are only 3 such instances.
+
+	'''
+
+
+	st.markdown(table_exp_text, unsafe_allow_html = True)
+
+
+
+	# od_df = od_df[
+
+
+	# 	(orders_df.order_status_key != 'Cancelled By System') & 
+
+
+	# 	(orders_df.is_driver_assigned_key != 'Yes')
+
+
+	# ]	
+
+
+
+	# Distribution By Hour Plot
+
+
+	line_break()
+
+
+	line_break()
+
+
+	st.markdown("### Ride Cancellations by Hour")
+
+
+	line_break()
+
+
+	num_orders_df_overall = od_df.groupby(
+
+			['booking_hour'],
+
+			as_index=False,
+
+			dropna=False
+
+	).agg(
+
+			{"order_gk": pd.Series.nunique}
+
+	).sort_values(
+
+
+			by=['booking_hour'],
+
+
+			ascending=[True]
+
+
+	)
+
+
+
+	num_orders_df_overall.columns = ['hour', 'cancelled_orders']
+
+
+
+
+
+	num_orders_df_cl = od_df[od_df.order_status_key == 'Cancelled By Client'].groupby(
+
+			['booking_hour'],
+
+			as_index=False,
+
+			dropna=False
+
+	).agg(
+
+
+			{"order_gk": pd.Series.nunique}
+
+
+	).sort_values(
+
+
+			by=['booking_hour'],
+
+
+			ascending=[True]
+
+
+	)
+
+
+
+	num_orders_df_cl.columns = ['hour', 'cancelled_orders']
+
+
+
+	# st.write(num_orders_df_cl.shape)
+
+
+
+
+
+
+	num_orders_df_sys = od_df[od_df.order_status_key == 'Cancelled By System'].groupby(
+
+			['booking_hour'],
+
+			as_index=False,
+
+			dropna=False
+
+	).agg(
+
+
+			{"order_gk": pd.Series.nunique}
+
+
+	).sort_values(
+
+
+			by=['booking_hour'],
+
+
+			ascending=[True]
+
+
+	)
+
+
+
+	num_orders_df_sys.columns = ['hour', 'cancelled_orders']
+
+
+	# st.write(num_orders_df_sys.shape)
+
+
+	num_orders_df_cl_dr = od_df[
+
+
+	(od_df.order_status_key == 'Cancelled By Client') & 
+
+
+	(od_df.is_driver_assigned_key == 'Yes')
+
+	].groupby(
+
+			['booking_hour'],
+
+			as_index=False,
+
+			dropna=False
+
+	).agg(
+
+
+			{"order_gk": pd.Series.nunique}
+
+
+	).sort_values(
+
+
+			by=['booking_hour'],
+
+
+			ascending=[True]
+
+
+	)
+
+
+
+	num_orders_df_cl_dr.columns = ['hour', 'cancelled_orders']
+
+
+
+	# st.write(num_orders_df_cl_dr.shape)
+
+
+
+
+
+	num_orders_df_cl_no_dr = od_df[
+
+		(od_df.order_status_key == 'Cancelled By Client') & 
+
+		(od_df.is_driver_assigned_key == 'No')
+
+	].groupby(
+
+			['booking_hour'],
+
+			as_index=False,
+
+			dropna=False
+
+	).agg(
+
+
+			{"order_gk": pd.Series.nunique}
+
+
+	).sort_values(
+
+
+			by=['booking_hour'],
+
+
+			ascending=[True]
+
+
+	)
+
+
+
+	num_orders_df_cl_no_dr.columns = ['hour', 'cancelled_orders']
+
+
+
+	# st.write(num_orders_df_cl_no_dr.shape)
+
+
+
+
+
+	# Let's Plot an Overall Line Chart
+
+
+
+	fig = go.Figure()
+
+
+
+	fig.add_trace(
+
+
+		go.Scatter(
+
+			x = num_orders_df_overall.hour.apply(lambda x: str(x)), 
+
+			y = num_orders_df_overall.cancelled_orders, 
+
+			text = num_orders_df_overall.cancelled_orders, 
+
+			mode = 'lines+markers',
+
+			name = 'Ride Cancellations'
+
+		)
+
+	)
+
+
+
+	hovertemp = "<br><br>".join(
+
+		[
+
+			"<b>Hour: %{x}</b>", 
+
+
+			"<b>Ride Cancellations: %{y:,.0f}</b><extra></extra>"
+
+		]
+
+	)
+
+
+
+	texttemp = "<b>%{y:,.0f}</b>"
+
+
+	fig.update_traces(
+
+		hovertemplate = hovertemp, 
+
+		texttemplate = texttemp, 
+
+		textposition = 'top center'
+
+	)
 
 
 
@@ -1519,9 +1891,21 @@ with tab1:
 
 	# 	title = dict(
 
+
 	# 		text = "Ride Cancellations by Hour\n", 
 
-	# 		font = dict(size = 25)
+
+	# 		x = 0.5,
+
+
+	# 		xanchor = 'center',
+
+
+	# 		yanchor = 'top',
+
+
+	# 		font=dict(size = 23)
+
 
 	# 	)
 
@@ -1529,13 +1913,760 @@ with tab1:
 
 
 
-
-	# st.plotly_chart(fig, use_container_width = True)
-
+	fig.update_xaxes(title = "Hour", showgrid = False)
 
 
 
-	# line_break()
+	fig.update_yaxes(title = "Ride Cancellations")
+
+
+
+	st.plotly_chart(fig, use_container_width = True)
+
+
+
+
+	cancl_by_hour_text = '''
+
+
+  From the above line chart we can deduce that,
+
+
+  - The number of ride cancellations reaches a peak of 1,082 at 8 am.
+
+  - There is a steady increase in the number of ride cancellations from 11 am to 5 pm.
+
+  - There is drop in ride cancellations at 7 pm followed by a steep rise at 9 pm which lasts until 11 pm.
+
+  - Additionally, we also noticed a growth in ride cancellations from 2 to 3 am.
+
+  - The probable cause for the increase in ride cancellations at certain hours of the day: **Driver Demand-Supply Gap**
+    
+  - Clients cancel their rides when drivers aren't assigned quickly enough, or the system cancels rides if it can't find drivers within the set time limit.
+
+
+	'''
+
+
+
+	st.markdown(cancl_by_hour_text, unsafe_allow_html = True)
+
+
+
+
+	line_break()
+
+
+	line_break()
+
+
+
+	st.markdown("### By Order Status")
+
+
+
+
+	# Line Chart With Order Status Filters
+
+
+
+	fig = go.Figure()
+
+
+
+	fig.add_trace(
+
+		go.Scatter(
+
+			x = num_orders_df_cl.hour.apply(lambda x: str(x)), 
+
+			y = num_orders_df_cl.cancelled_orders, 
+
+			text = num_orders_df_cl.cancelled_orders, 
+
+			mode = 'lines+markers',
+
+			name = 'Cancelled by Client'
+
+		)
+
+	)
+
+
+
+	fig.add_trace(
+
+		go.Scatter(
+
+			x = num_orders_df_sys.hour.apply(lambda x: str(x)), 
+
+			y = num_orders_df_sys.cancelled_orders, 
+
+			mode = 'lines+markers', 
+
+			text = num_orders_df_sys.cancelled_orders,
+
+			name = 'Cancelled by System'
+
+		)
+
+	)
+
+
+
+	hovertemp = "<br><br>".join(
+
+		[
+
+			"<b>Hour: %{x}</b>", 
+
+
+			"<b>Ride Cancellations: %{y:,.0f}</b><extra></extra>"
+
+		]
+
+	)
+
+
+
+	texttemp = "<b>%{y:,.0f}</b>"
+
+
+	fig.update_traces(
+
+		hovertemplate = hovertemp, 
+
+		texttemplate = texttemp, 
+
+		textposition = 'top center'
+
+	)
+
+
+
+	# fig.update_layout(
+
+	# 	title = dict(
+
+
+	# 		text = "Ride Cancellations by Hour\n", 
+
+
+	# 		x = 0.5,
+
+
+	# 		xanchor = 'center',
+
+
+	# 		yanchor = 'top',
+
+
+	# 		font=dict(size = 23)
+
+
+	# 	)
+
+	# )
+
+
+
+	fig.update_xaxes(title = "Hour", showgrid = False)
+
+
+
+	fig.update_yaxes(title = "Ride Cancellations")
+
+
+
+	st.plotly_chart(fig, use_container_width = True)
+
+
+
+	line_break()
+
+
+
+	cacl_by_status_text = '''
+
+  - Apart from the fact that ride cancellations by client is greater than ride cancellations by system, **the trend is basically the same**.
+
+  - There is a peak at 8 am, followed by a decline until 10 am and then a steady ascent from 11 am until 5 pm.
+
+  - There is drop in ride cancellations at 7 pm followed by a steep rise at 9 pm which lasts until 11 pm.
+
+  - There is also a growth in ride cancellations from 2 to 3 am.
+
+  - The probable cause for the growth in ride cancellations at certain hours of the day remains the same as before: **Driver Demand-Supply Gap**
+
+  - Clients cancel their rides when drivers aren't assigned quickly enough, or the system cancels rides if it can't find drivers within the set time limit.
+
+  '''
+
+ 
+	st.markdown(f"{cacl_by_status_text}", unsafe_allow_html = True)
+
+
+
+	line_break()
+
+
+	line_break()
+
+
+
+	st.markdown('''### By Driver Assigned For Orders That Were Cancelled By Client''')
+
+
+
+
+	# Line Chart With Driver Assigned Filters (For Orders That Were Cancelled By Client)
+
+
+
+	fig = go.Figure()
+
+
+
+	fig.add_trace(
+
+		go.Scatter(
+
+			x = num_orders_df_cl_dr.hour.apply(lambda x: str(x)), 
+
+			y = num_orders_df_cl_dr.cancelled_orders, 
+
+			text = num_orders_df_cl_dr.cancelled_orders, 
+
+			mode = 'lines+markers',
+
+			name = 'Driver Assigned'
+
+		)
+
+	)
+
+
+
+	fig.add_trace(
+
+		go.Scatter(
+
+			x = num_orders_df_cl_no_dr.hour.apply(lambda x: str(x)), 
+
+			y = num_orders_df_cl_no_dr.cancelled_orders, 
+
+			mode = 'lines+markers', 
+
+			text = num_orders_df_cl_no_dr.cancelled_orders,
+
+			name = 'Driver Not Assigned'
+
+		)
+
+	)
+
+
+
+	hovertemp = "<br><br>".join(
+
+		[
+
+			"<b>Hour: %{x}</b>", 
+
+
+			"<b>Ride Cancellations: %{y:,.0f}</b><extra></extra>"
+
+		]
+
+	)
+
+
+
+	texttemp = "<b>%{y:,.0f}</b>"
+
+
+	fig.update_traces(
+
+		hovertemplate = hovertemp, 
+
+		texttemplate = texttemp, 
+
+		textposition = 'top center'
+
+	)
+
+
+
+	# fig.update_layout(
+
+	# 	title = dict(
+
+
+	# 		text = "Ride Cancellations by Hour\n", 
+
+
+	# 		x = 0.5,
+
+
+	# 		xanchor = 'center',
+
+
+	# 		yanchor = 'top',
+
+
+	# 		font=dict(size = 23)
+
+
+	# 	)
+
+	# )
+
+
+
+	fig.update_xaxes(title = "Hour", showgrid = False)
+
+
+
+	fig.update_yaxes(title = "Ride Cancellations")
+
+
+
+	st.plotly_chart(fig, use_container_width = True)
+
+
+	line_break()
+
+
+	dr_assigned_cacl_text = '''
+
+  From the above chart we can deduce that,
+
+
+  - Client ride cancellations where a driver was not assigned is greater than client ride cancellations where a driver was assigned.
+
+  - In the former case, cancellations are the highest at 9 pm followed by 8 am and then at 11 pm. Also, we get to see a steady increase from 11 am till 5 pm. Additionally, we get to see an increase in cancellations from 2 to 3 am.
+
+  - In the latter case too we get to see a spike at 8 am with a steady increase in cancellations from 11 am till 5 pm. We also get see a growth in cancellations from 10 pm to 11 pm and then a decline until 5 am.
+
+  - We can draw a conclusion from the above chart that rides that have a driver assigned to them are less likely to get cancelled by the client and vice versa.
+
+  - Long arrival times are likely the main reason clients cancel rides when a driver is assigned. They may not want to wait an excessive amount of time, especially when they are in a hurry.
+
+
+	'''
+
+
+
+	st.markdown(f"{dr_assigned_cacl_text}", unsafe_allow_html = True)
+
+
+
+	line_break()
+
+
+	line_break()
+
+
+	st.markdown('### Mean Cancellation Time By Hour')
+
+
+
+	cacl_time_df_cl_dr = od_df[
+
+
+	(od_df.order_status_key == 'Cancelled By Client') & 
+
+
+	(od_df.is_driver_assigned_key == 'Yes')
+
+	].groupby(
+
+			['booking_hour'],
+
+			as_index=False,
+
+			dropna=False
+
+	).agg(
+
+
+			{"cancellations_time_in_minutes": pd.Series.mean}
+
+
+	).sort_values(
+
+
+			by=['booking_hour'],
+
+
+			ascending=[True]
+
+
+	)
+
+
+
+	cacl_time_df_cl_dr.columns = ['hour', 'mean_cancellations_time_in_minutes']
+
+
+
+	# st.write(num_orders_df_cl_dr.shape)
+
+
+
+	cacl_time_df_cl_no_dr = od_df[
+
+		(od_df.order_status_key == 'Cancelled By Client') & 
+
+		(od_df.is_driver_assigned_key == 'No')
+
+	].groupby(
+
+			['booking_hour'],
+
+			as_index=False,
+
+			dropna=False
+
+	).agg(
+
+
+			{"cancellations_time_in_minutes": pd.Series.mean}
+
+
+	).sort_values(
+
+
+			by=['booking_hour'],
+
+
+			ascending=[True]
+
+
+	)
+
+
+
+	cacl_time_df_cl_no_dr.columns = ['hour', 'mean_cancellations_time_in_minutes']
+
+
+
+
+	# Mean Cancellations Time Line Chart
+
+
+	fig = go.Figure()
+
+
+
+	fig.add_trace(
+
+		go.Scatter(
+
+			x = cacl_time_df_cl_dr.hour.apply(lambda x: str(x)), 
+
+			y = cacl_time_df_cl_dr.mean_cancellations_time_in_minutes, 
+
+			text = cacl_time_df_cl_dr.mean_cancellations_time_in_minutes, 
+
+			mode = 'lines+markers',
+
+			name = 'Driver Assigned'
+
+		)
+
+	)
+
+
+
+	fig.add_trace(
+
+		go.Scatter(
+
+			x = cacl_time_df_cl_no_dr.hour.apply(lambda x: str(x)), 
+
+			y = cacl_time_df_cl_no_dr.mean_cancellations_time_in_minutes, 
+
+			mode = 'lines+markers', 
+
+			text = cacl_time_df_cl_no_dr.mean_cancellations_time_in_minutes,
+
+			name = 'Driver Not Assigned'
+
+		)
+
+	)
+
+
+
+	hovertemp = "<br><br>".join(
+
+		[
+
+			"<b>Hour: %{x}</b>", 
+
+
+			"<b>%{y:.1f} minutes</b><extra></extra>"
+
+		]
+
+	)
+
+
+
+	texttemp = "<b>%{y:.1f}</b>"
+
+
+
+	fig.update_traces(
+
+		hovertemplate = hovertemp, 
+
+		texttemplate = texttemp, 
+
+		textposition = 'top center'
+
+	)
+
+
+
+	# fig.update_layout(
+
+	# 	title = dict(
+
+
+	# 		text = "Ride Cancellations by Hour\n", 
+
+
+	# 		x = 0.5,
+
+
+	# 		xanchor = 'center',
+
+
+	# 		yanchor = 'top',
+
+
+	# 		font=dict(size = 23)
+
+
+	# 	)
+
+	# )
+
+
+
+	fig.update_xaxes(title = "Hour", showgrid = False)
+
+
+
+	fig.update_yaxes(title = "Mean Cancellation Time in Minutes")
+
+
+
+	st.plotly_chart(fig, use_container_width = True)
+
+
+	line_break()
+
+
+	cacl_time_text = '''
+  
+  From the above chart we can deduce that,
+
+
+  - The mean ride cancellation time by client when a driver is assigned is greater than the mean ride cancellation time when a driver is not assigned.
+
+
+  - When a driver is assigned, clients might hold off on canceling because they hope the driver will arrive soon. Conversely, when a driver isn't readily available, clients might cancel more quickly due to uncertainty about the wait time. Ultimately, the system's processing time plays a role in both scenarios.
+
+
+  - The mean cancellation time is the maximum at 5 am and is the lowest at hours 7 and 8 in cases where a driver is assigned. This is followed by a peak at 11 am then a decline until 3 pm and again an incline until 6 pm. The mean cancellation time dips again at 7 pm followed by a steady increase until 11 pm. This is followed by peaks until 3 am.
+
+
+  - In the case of ride cancellations where a driver is not assigned, the mean cancellation time is the maximum at 4 pm followed by peaks at 11 pm and from 5 am to 9 am. It reaches its lowest point at 10am and then gradually rises hitting a maximum at 4pm.
+
+
+	'''
+
+
+	st.markdown(f"{cacl_time_text}", unsafe_allow_html = True)
+
+
+
+	line_break()
+
+
+	line_break()
+
+
+
+	st.markdown("### Mean Time Before Order Arrival By Hour")
+
+
+
+
+	# DataFrame
+
+
+
+	eta_time_df_cl = od_df[
+
+
+	(od_df.order_status_key == 'Cancelled By Client')
+
+	].groupby(
+
+			['booking_hour'],
+
+			as_index=False,
+
+			dropna=False
+
+	).agg(
+
+
+			{"m_order_eta": pd.Series.mean}
+
+
+	).sort_values(
+
+
+			by=['booking_hour'],
+
+
+			ascending=[True]
+
+
+	)
+
+
+
+	eta_time_df_cl.columns = ['hour', 'mean_m_order_eta']
+
+
+
+
+	# Mean Time Before Order Arrival In Minutes By Hour Line Chart
+
+
+
+	fig = go.Figure()
+
+
+
+	fig.add_trace(
+
+		go.Scatter(
+
+			x = eta_time_df_cl.hour.apply(lambda x: str(x)), 
+
+			y = eta_time_df_cl.mean_m_order_eta, 
+
+			text = eta_time_df_cl.mean_m_order_eta, 
+
+			mode = 'lines+markers',
+
+			name = 'Mean Time Before Order Arrival in Minutes'
+
+		)
+
+	)
+
+
+
+
+
+	hovertemp = "<br><br>".join(
+
+		[
+
+			"<b>Hour: %{x}</b>", 
+
+
+			"<b>%{y:.1f} minutes</b><extra></extra>"
+
+		]
+
+	)
+
+
+
+	texttemp = "<b>%{y:.1f} minutes</b>"
+
+
+	fig.update_traces(
+
+		hovertemplate = hovertemp, 
+
+		texttemplate = texttemp, 
+
+		textposition = 'top center'
+
+	)
+
+
+
+	# fig.update_layout(
+
+	# 	title = dict(
+
+
+	# 		text = "Ride Cancellations by Hour\n", 
+
+
+	# 		x = 0.5,
+
+
+	# 		xanchor = 'center',
+
+
+	# 		yanchor = 'top',
+
+
+	# 		font=dict(size = 23)
+
+
+	# 	)
+
+	# )
+
+
+
+	fig.update_xaxes(title = "Hour", showgrid = False)
+
+
+
+	fig.update_yaxes(title = "Mean Time Before Order Arrival in Minutes")
+
+
+
+	st.plotly_chart(fig, use_container_width = True)
+
+
+
+	line_break()
+
+
+	m_order_eta_text = '''
+
+	From the above chart we can deduce that,
+
+
+  - The time before order arrival peaks at 8 am with an acute drop until 10 am. Thereafter it gradually increases until 5 pm followed by an acute drop until 8 pm. Thereafter it again rises until 11 pm.
+
+  - The peaks at 8 am and 5 pm likely coincide with morning and evening rush hours, when road traffic significantly increases.
+
+
+	'''
+
+
+
+	st.markdown(f"{m_order_eta_text}", unsafe_allow_html = True)
+
+
+
+
 
 
 
