@@ -2114,6 +2114,8 @@ with tab3:
 
 	cacl_by_status_text = '''
 
+	From the above chart we can deduce that,
+
   - Apart from the fact that ride cancellations by client is greater than ride cancellations by system, **the trend is basically the same**.
 
   - There is a peak at 8 am, followed by a decline until 10 am and then a steady ascent from 11 am until 5 pm.
@@ -2676,7 +2678,7 @@ with tab3:
 
 	m_order_eta_text = '''
 
-	From the above chart we can deduce that,
+	From the above line chart we can deduce that,
 
 
   - The time before order arrival peaks at 8 am with an acute drop until 10 am. Thereafter it gradually increases until 5 pm followed by an acute drop until 8 pm. Thereafter it again rises until 11 pm.
