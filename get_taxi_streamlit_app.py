@@ -1376,7 +1376,9 @@ with tab1:
 
 	with ycol1:
 
+
 			def change_left_y_sel():
+
 
 					if st.session_state.new_left_y != st.session_state.new_right_y:
 
@@ -1394,6 +1396,19 @@ with tab1:
 
 							)
 
+
+
+					st.session_state.portray_metrics_right = [
+
+						i for i in portray_metrics if i != st.session_state.left_y
+
+					]
+
+
+					st.session_state.portray_metrics_right.extend(['None'])
+
+
+
 			left_y_sel = st.selectbox(
 
 
@@ -1403,7 +1418,7 @@ with tab1:
 					st.session_state.portray_metrics_left,
 
 
-					index=0,
+					index=st.session_state.portray_metrics_left.index(st.session_state.left_y),
 
 
 					on_change=change_left_y_sel,
@@ -1416,6 +1431,7 @@ with tab1:
 
 
 	with ycol2:
+
 
 			def change_right_y_sel():
 
@@ -1435,6 +1451,15 @@ with tab1:
 
 							)
 
+
+					st.session_state.portray_metrics_left = [
+
+						i for i in portray_metrics if i != st.session_state.right_y
+
+					]
+
+
+
 			right_y_sel = st.selectbox(
 
 
@@ -1444,7 +1469,7 @@ with tab1:
 					st.session_state.portray_metrics_right,
 
 
-					index=0,
+					index=st.session_state.portray_metrics_right.index(st.session_state.right_y),
 
 
 					on_change=change_right_y_sel,
